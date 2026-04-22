@@ -1,0 +1,82 @@
+# B-SSAHTY: Frontend UI Requirements
+
+Based on the project concept, architecture, and backend API endpoints, here is the complete breakdown of all the Pages, Modals, and Components needed for the Vue 3 frontend.
+
+---
+
+## 1. Authentication & Onboarding
+**Pages:**
+- **Login Page**: Email & Password form.
+- **Register Page**: Name, Email, Password, and City form.
+- **Landing Page (Public)**: Presentation of the app concept ("Connect athletes in real life").
+
+---
+
+## 2. Main Layout
+**Components:**
+- **Navigation Bar / Sidebar**: Links to Home (Feed), Map, Events, Messages, Friends, and Profile.
+- **Notification Dropdown**: Real-time alerts for friend requests and new messages (via WebSockets).
+
+---
+
+## 3. Community Feed (Questions)
+**Pages:**
+- **Home / Feed Page**: 
+  - List of recent questions/posts.
+  - Filter mechanism by `SportCategory` (Football, Tennis, Running, etc.).
+- **Question Detail Page**:
+  - Full view of the question.
+  - Comments section.
+  - Like / Dislike reaction buttons.
+
+**Modals:**
+- **Create Question Modal**: Form with Title, Content, Sport Category dropdown, and optional Spot selection.
+- **Transform to Event Modal**: For the author to convert their question into a real-life event (Date, Max Participants).
+
+---
+
+## 4. Map & Spots
+**Pages:**
+- **Interactive Map Page**: Full-screen map using Leaflet & OpenStreetMap. Displays markers for all `APPROVED` spots.
+
+**Modals / Sidebars:**
+- **Spot Detail Sidebar**: Slides in when a spot marker is clicked. Shows spot name, location, and questions tied to this spot.
+- **Suggest Spot Modal**: Form to add a new spot by clicking on the map (captures Lat/Lng) and providing a name. (Sends status to `PENDING`).
+
+---
+
+## 5. Events
+**Pages:**
+- **Events List Page**: Displays upcoming sports events. Filterable by `OPEN`, `FULL`, or `CLOSED`.
+- **Event Detail Page**: View event date, max participants, current participants, and related discussion.
+
+**Modals:**
+- **Create Event Modal**: Form for creating an event directly (Date, Max Participants).
+
+---
+
+## 6. Social & Network
+**Pages:**
+- **Friends Dashboard**: Tabs for "My Friends", "Pending Requests", and "Blocked".
+- **User Public Profile Page**: View another user's city, level (Beginner/Pro), and their recent activity. Includes "Add Friend" and "Send Message" buttons.
+- **My Profile Page**: Edit personal info, view own questions/events.
+
+---
+
+## 7. Private Messaging (Real-Time)
+**Pages:**
+- **Chat Interface Page**: 
+  - Left column: List of active conversations.
+  - Right column: Active chat window with real-time WebSocket updates.
+
+**Modals:**
+- **New Conversation Modal**: Select a friend from the friend list to start a new chat.
+
+---
+
+## 8. Admin Dashboard (Role: ADMIN)
+**Pages:**
+- **Admin Layout**: Separate from the main app interface.
+- **Users Management Page**: Table of all users with "Ban" / "Unban" toggle buttons.
+- **Spots Moderation Page**: List of `PENDING` spots with "Approve" and "Reject" buttons.
+- **Content Moderation**: Ability to force-delete inappropriate Questions or Comments.

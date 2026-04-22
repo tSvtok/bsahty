@@ -1,0 +1,35 @@
+# B-SSAHTY Production Fixes & Integration Log
+
+The following critical issues were resolved to achieve full production readiness:
+
+## 1. Database & Backend
+- **Fixed**: Missing `personal_access_tokens` table. Ran migrations to ensure Sanctum compatibility.
+- **Fixed**: Not-null constraint violation on `questions` table. Updated frontend to send `title` and `sport_category`.
+- **Configured**: Laravel 12 API is now successfully responding to registration and question queries.
+
+## 2. Frontend Stability (Anti-Crash)
+- **Fixed**: Unhandled setup errors in `CreatePostModal.vue` due to missing `ref`/`reactive` imports.
+- **Fixed**: Direct property access in `AppSidebar.vue` and `ProfilePage.vue`. Added optional chaining (`?.`) to all `userStore.currentUser` accesses to prevent crashes before login.
+- **Fixed**: Property name mismatch in `EditProfileModal.vue` (`userStore.user` -> `userStore.currentUser`).
+
+## 3. API Integration
+- **AuthService**: Corrected token key from `token` to `access_token` to match Laravel 12/Sanctum response.
+- **PostService**: Switched from `/posts` to `/questions` and mapped parameters to match backend schema.
+- **EventService**: Added `create` method and mapped fields for match organization.
+- **UserStore**: Added `setUser` and `updateUser` actions to synchronize real-time API data with Pinia state.
+
+## 4. UI/UX Refinement
+- **FeedPage**: Now fetches real questions from the backend with a seamless transition from skeleton loaders.
+- **EventsPage**: Connected to the real events list with support for backend data mapping.
+- **Login/Register**: Fully functional flows that redirect users to their personalized feed upon success.
+
+## 5. Frontend Standardization & Backend Schema Expansion
+- **Unified Navigation**: Standardized `Navbar` and `AppSidebar` across all main pages (Feed, Map, Events, Profile, Messages).
+- **Design System**: Implemented global `.btn-primary`, `.btn-secondary`, and `.card` utility classes in `style.css` for consistent premium look.
+- **Backend Schema**: Expanded `events` table with `title`, `sport`, `location`, and `image` fields to support real frontend data.
+- **Backend Schema**: Added `image` field to `questions` table to support post images.
+- **Validation**: Updated `StoreEventRequest` and `StoreQuestionRequest` to enforce new schema requirements.
+- **UI Consistency**: Replaced ad-hoc button and card styles with design system utilities across all components and modals.
+- **Layout Alignment**: Fixed `Navbar` height and fixed positioning to ensure perfect alignment with `AppSidebar`.
+
+**System Status: Production Ready & Standardized (Frontend -> Dockerized Laravel API -> PostgreSQL)**

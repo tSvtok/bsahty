@@ -1,0 +1,34 @@
+=======================================================
+PROJECT ANALYSIS: B-SSAHTY
+=======================================================
+
+1. PROJECT CONCEPT (from project.md)
+-------------------------------------------------------
+B-SSAHTY is a geo-localized sports social network designed to connect athletes in real life. It aims to reduce sports isolation by allowing users to:
+- Find sports partners nearby.
+- Ask questions and interact (like/dislike, comments).
+- Discover, add, and evaluate sports spots.
+- Organize real-time sports events.
+- Communicate via private messaging.
+- Build a friend network.
+
+Technical Stack:
+- Backend: Laravel 13 (PHP 8.4) with PostgreSQL/PostGIS for geo-localization, WebSockets for real-time.
+- Frontend: Vue.js 3 (Vue Router, Pinia, TailwindCSS).
+
+2. SYSTEM ACTORS & ARCHITECTURE (from classdiagramm.puml)
+-------------------------------------------------------
+- User / Visitor / Admin hierarchy: Admin moderates users, deletes content, validates spots.
+
+Core Domain Models:
+- Spot: Geographic location for sports, includes coordinates (Point) and an approval status.
+- Question: Core interaction element tied to a sport category. Can contain a Spot and an Event.
+- Event: Organized from a Question. Has a date, max participants, and status.
+
+Social Domain Models:
+- Comment & Reaction: For interacting with Questions.
+- Friendship: Managing friend lists.
+- Conversation & Message: Private chat system.
+
+Enums Defined:
+- UserLevel, LocationStatus, EventStatus, SportCategory, ReactionType, FriendshipStatus.

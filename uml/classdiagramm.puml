@@ -1,0 +1,157 @@
+@startuml
+
+' ========================
+' ENUMS
+' ========================
+enum UserLevel {
+  BEGINNER
+  INTERMEDIATE
+  PRO
+}
+
+enum LocationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EventStatus {
+  OPEN
+  FULL
+  CLOSED
+}
+
+enum SportCategory {
+  FOOTBALL
+  TENNIS
+  BASKETBALL
+  RUNNING
+  YOGA
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+' ========================
+' CORE USER SYSTEM
+' ========================
+abstract class User {
+  id: UUID
+  name: string
+  email: string
+  password: string
+  city: string
+  isBanned: boolean
+}
+
+class Admin {
+  +banUser(userId: UUID)
+  +unbanUser(userId: UUID)
+  +deleteQuestion(questionId: UUID)
+  +deleteLocation(locationId: UUID)
+}
+
+class Visitor {
+ 
+}
+
+Visitor <|-- User
+User <|-- Admin
+
+' ========================
+' CORE DOMAIN
+' ========================
+class Spot {
+  id: UUID
+  name: string
+  coordinates: Point
+  status: LocationStatus
+}
+
+class Question {
+  id: UUID
+  title: string
+  content: text
+  created_at: datetime
+  sportCategory: SportCategory
+}
+
+class Event {
+  id: UUID
+  date: datetime
+  max_participants: int
+  status: EventStatus
+}
+
+' ========================
+' SOCIAL FEATURES
+' ========================
+class Comment {
+  id: UUID
+  content: text
+  created_at: datetime
+}
+
+class Reaction {
+  id: UUID
+  type: ReactionType
+}
+
+class Friendship {
+  id: UUID
+  status: FriendshipStatus
+}
+
+class Conversation {
+  id: UUID
+  created_at: datetime
+}
+
+class Message {
+  id: UUID
+  content: text
+  created_at: datetime
+  isRead: boolean
+}
+
+' ========================
+' MAP SERVICE (EXTERNAL LOGIC)
+' ========================
+class MapService {
+  +getNearbyLocations(location: Point, radius: int)
+  +geocode(address: string): Point
+}
+
+' ========================
+' RELATIONSHIPS
+' ========================
+
+Visitor --> Question : creates
+Visitor --> Comment : writes
+Visitor --> Reaction : reacts
+Visitor --> Friendship : manages
+Visitor --> Message : sends
+
+Question --> Spot
+Question --> Event
+Question --> Comment
+Question --> Reaction
+
+Conversation --> Message
+Visitor --> Conversation : participates
+
+Visitor --> User : moderates
+Visitor --> Question : deletes
+Visitor --> Spot : deletes
+
+MapService --> Spot
+
+@enduml

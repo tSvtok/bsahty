@@ -33,4 +33,9 @@ RUN mkdir -p /home/$user/.composer && \
 # Set working directory
 WORKDIR /var/www
 
+# Custom PHP settings
+USER root
+RUN echo "upload_max_filesize=20M" > /usr/local/etc/php/conf.d/uploads.ini && \
+    echo "post_max_size=20M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 USER $user

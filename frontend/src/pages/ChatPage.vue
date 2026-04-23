@@ -73,11 +73,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 import { messagingApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import echo from '@/services/echo'
 
 const route       = useRoute()
 const auth        = useAuthStore()
@@ -95,7 +96,7 @@ const otherAvatar = computed(() =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.value?.name || 'A')}&background=f97316&color=fff&size=60`
 )
 
-function isMe(msg) { return msg.sender_id === auth.user?.id }
+function isMe(msg) { return msg.user_id === auth.user?.id || msg.sender_id === auth.user?.id }
 
 function formatTime(ts) {
   if (!ts) return ''
@@ -114,13 +115,18 @@ async function sendMessage() {
   sending.value = true
 
   // Optimistic
-  messages.value.push({ id: Date.now(), body, sender_id: auth.user?.id, created_at: new Date().toISOString() })
+  const tempId = Date.now()
+  messages.value.push({ id: tempId, body, user_id: auth.user?.id, created_at: new Date().toISOString() })
   await scrollToBottom()
 
   try {
-    await messagingApi.send({ conversation_id: conversationId.value, body })
+    const res = await messagingApi.send({ conversation_id: conversationId.value, body })
+    // Replace temp message with actual data
+    const idx = messages.value.findIndex(m => m.id === tempId)
+    if (idx !== -1) messages.value[idx] = res.data.data
   } catch {
-    messages.value.pop()
+    const idx = messages.value.findIndex(m => m.id === tempId)
+    if (idx !== -1) messages.value.splice(idx, 1)
   } finally {
     sending.value = false
   }
@@ -129,12 +135,26 @@ async function sendMessage() {
 onMounted(async () => {
   try {
     const res  = await messagingApi.conversation(conversationId.value)
-    messages.value = res.data.messages || []
-    otherUser.value = res.data.other_user
+    messages.value = res.data.data.messages || []
+    otherUser.value = res.data.data.other_user
   } catch {}
   finally {
     loading.value = false
     await scrollToBottom()
   }
+
+  // Real-time
+  echo.private(`conversation.${conversationId.value}`)
+    .listen('MessageSent', (e) => {
+      // Don't duplicate if it's from me (optimistic update handles it)
+      if (e.message.user_id !== auth.user?.id) {
+        messages.value.push(e.message)
+        scrollToBottom()
+      }
+    })
+})
+
+onUnmounted(() => {
+  echo.leave(`conversation.${conversationId.value}`)
 })
 </script>

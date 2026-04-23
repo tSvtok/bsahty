@@ -11,7 +11,7 @@ class QuestionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Question::with(['user', 'spot', 'event', 'comments']);
+        $query = Question::with(['user', 'spot', 'event', 'comments.user', 'reactions']);
         
         if ($request->has('sport_category')) {
             $query->where('sport_category', $request->sport_category);
@@ -40,7 +40,7 @@ class QuestionController extends Controller
     public function update(UpdateQuestionRequest $request, Question $question)
     {
         // Check if user is the owner or an admin
-        if ($question->user_id !== $request->user()->id && $request->user()->role->value !== 'admin') {
+        if ($question->user_id !== $request->user()->id && $request->user()->role !== \App\Enums\Role::ADMIN) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -52,7 +52,7 @@ class QuestionController extends Controller
     public function destroy(Request $request, Question $question)
     {
         // Check if user is the owner or an admin
-        if ($question->user_id !== $request->user()->id && $request->user()->role->value !== 'admin') {
+        if ($question->user_id !== $request->user()->id && $request->user()->role !== \App\Enums\Role::ADMIN) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

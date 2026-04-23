@@ -31,4 +31,26 @@ class AdminController extends Controller
         $spot->update(['status' => 'REJECTED']);
         return response()->json(['message' => 'Spot rejected successfully']);
     }
+
+    public function getStats()
+    {
+        return response()->json([
+            'users_count' => User::count(),
+            'spots_count' => Spot::count(),
+            'pending_spots_count' => Spot::where('status', 'PENDING')->count(),
+            'events_count' => \App\Models\Event::count(),
+        ]);
+    }
+
+    public function getPendingSpots()
+    {
+        $spots = Spot::where('status', 'PENDING')->latest()->get();
+        return response()->json(['data' => $spots]);
+    }
+
+    public function getUsers()
+    {
+        $users = User::latest()->get();
+        return response()->json(['data' => $users]);
+    }
 }

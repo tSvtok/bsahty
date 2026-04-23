@@ -18,6 +18,10 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'city' => 'sometimes|string|max:255',
+            'bio' => 'sometimes|nullable|string|max:1000',
+            'location' => 'sometimes|nullable|string|max:255',
+            'avatar' => 'sometimes|nullable|string|max:2048',
+            'sports' => 'sometimes|nullable|array',
         ]);
 
         $user = $request->user();

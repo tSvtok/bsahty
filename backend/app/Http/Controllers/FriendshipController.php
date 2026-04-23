@@ -19,7 +19,7 @@ class FriendshipController extends Controller
                 $query->where('user_id', $user->id)
                       ->orWhere('friend_id', $user->id);
             })
-            ->where('status', 'ACCEPTED')
+            ->where('status', FriendshipStatus::ACCEPTED)
             ->get();
 
         return response()->json(['data' => $friendships]);
@@ -55,10 +55,10 @@ class FriendshipController extends Controller
 
     public function update(Request $request, Friendship $friendship)
     {
-        $request->validate(['status' => 'required|in:ACCEPTED,BLOCKED']);
+        $request->validate(['status' => 'required|string']);
 
         // Only the receiver can accept
-        if ($request->user()->id !== $friendship->friend_id && $request->status === 'ACCEPTED') {
+        if ($request->user()->id !== $friendship->friend_id && $request->status === FriendshipStatus::ACCEPTED->value) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

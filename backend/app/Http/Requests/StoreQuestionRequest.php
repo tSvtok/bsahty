@@ -16,7 +16,7 @@ class StoreQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:255'],
             'content' => ['required', 'string'],
             'image' => ['nullable', 'string'],
             'sport_category' => ['required', new Enum(SportCategory::class)],

@@ -8,15 +8,22 @@ use App\Models\Event;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $events = Event::with('questions')->latest()->paginate(15);
+        $query = Event::with('questions');
+
+        if ($request->has('sport')) {
+            $query->where('sport', $request->sport);
+        }
+
+        $events = $query->latest()->paginate(15);
         return response()->json(['data' => $events]);
     }
 
     public function store(StoreEventRequest $request)
     {
         $validated = $request->validated();
+        $validated['organizer_id'] = $request->user()->id;
         
         $event = Event::create($validated);
 
@@ -38,6 +45,16 @@ class EventController extends Controller
 
     public function update(UpdateEventRequest $request, Event $event)
     {
+        if ($request->has('join')) {
+            $user = $request->user();
+            if ($request->join) {
+                $event->participants()->syncWithoutDetaching([$user->id]);
+            } else {
+                $event->participants()->detach($user->id);
+            }
+            return response()->json(['data' => $event->load('participants')]);
+        }
+
         $event->update($request->validated());
         return response()->json(['data' => $event]);
     }

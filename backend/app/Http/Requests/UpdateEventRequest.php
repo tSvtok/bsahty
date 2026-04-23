@@ -19,6 +19,7 @@ class UpdateEventRequest extends FormRequest
             'date' => ['sometimes', 'date', 'after:now'],
             'max_participants' => ['sometimes', 'integer', 'min:2'],
             'status' => ['sometimes', new Enum(EventStatus::class)],
+            'join' => ['sometimes', 'boolean'],
         ];
     }
 }

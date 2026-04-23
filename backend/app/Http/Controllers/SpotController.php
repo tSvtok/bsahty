@@ -20,16 +20,20 @@ class SpotController extends Controller
     {
         $validated = $request->validated();
         
-        // Handle PostGIS coordinates insert
-        $lat = $validated['latitude'];
-        $lng = $validated['longitude'];
-
         $spot = new Spot();
         $spot->name = $validated['name'];
         if (isset($validated['status'])) {
             $spot->status = $validated['status'];
         }
-        $spot->coordinates = DB::raw("ST_SetSRID(ST_MakePoint($lng, $lat), 4326)");
+        
+        // Store coordinates as JSON for now
+        if (isset($validated['latitude']) && isset($validated['longitude'])) {
+            $spot->coordinates = [
+                'lat' => $validated['latitude'],
+                'lng' => $validated['longitude']
+            ];
+        }
+        
         $spot->save();
 
         return response()->json(['data' => $spot], 201);
@@ -51,9 +55,10 @@ class SpotController extends Controller
             $spot->status = $validated['status'];
         }
         if (isset($validated['latitude']) && isset($validated['longitude'])) {
-            $lat = $validated['latitude'];
-            $lng = $validated['longitude'];
-            $spot->coordinates = DB::raw("ST_SetSRID(ST_MakePoint($lng, $lat), 4326)");
+            $spot->coordinates = [
+                'lat' => $validated['latitude'],
+                'lng' => $validated['longitude']
+            ];
         }
         $spot->save();
 

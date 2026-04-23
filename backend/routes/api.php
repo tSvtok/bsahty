@@ -11,6 +11,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\SpotController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     
     Route::get('/users/{user}', [UserController::class, 'show']);
-    Route::put('/users', [UserController::class, 'update']);
+    Route::put('/me', [UserController::class, 'update']);
 
     // Spots
     Route::get('/spots/nearby', [SpotController::class, 'nearby']);
@@ -56,11 +57,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/messages', [MessageController::class, 'store']);
     Route::patch('/messages/{message}/read', [MessageController::class, 'markAsRead']);
 
-    // Admin Routes
     Route::middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->prefix('admin')->group(function () {
+        Route::get('/stats', [AdminController::class, 'getStats']);
+        Route::get('/spots/pending', [AdminController::class, 'getPendingSpots']);
+        Route::get('/users', [AdminController::class, 'getUsers']);
         Route::patch('/users/{user}/ban', [AdminController::class, 'banUser']);
         Route::patch('/users/{user}/unban', [AdminController::class, 'unbanUser']);
         Route::patch('/spots/{spot}/approve', [AdminController::class, 'approveSpot']);
         Route::patch('/spots/{spot}/reject', [AdminController::class, 'rejectSpot']);
     });
+
+    // File Uploads
+    Route::post('/upload', [FileController::class, 'upload']);
+    Route::delete('/files', [FileController::class, 'destroy']);
 });

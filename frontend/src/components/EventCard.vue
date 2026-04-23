@@ -61,11 +61,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { eventsApi } from '@/services/api'
+import echo from '@/services/echo'
 
 const props = defineProps({ event: { type: Object, required: true } })
 const joined = ref(props.event.is_joined || false)
+const realTimeParticipantCount = ref(props.event.participants_count || 0)
 
 const sportEmojiMap = {
   football: '⚽', basketball: '🏀', tennis: '🎾', volleyball: '🏐',
@@ -73,7 +75,7 @@ const sportEmojiMap = {
 }
 
 const sportEmoji = computed(() => sportEmojiMap[props.event.sport?.toLowerCase()] || sportEmojiMap.default)
-const participantCount = computed(() => props.event.participants_count || 0)
+const participantCount = computed(() => realTimeParticipantCount.value)
 const maxParticipants  = computed(() => props.event.max_participants || 10)
 const spotsLeft   = computed(() => maxParticipants.value - participantCount.value)
 const isFull      = computed(() => spotsLeft.value <= 0)
@@ -105,18 +107,27 @@ async function handleJoin() {
   if (isJoining && isFull.value) return
   
   joined.value = isJoining
-  if (props.event.participants_count !== undefined) {
-    props.event.participants_count += isJoining ? 1 : -1
-  }
+  realTimeParticipantCount.value += isJoining ? 1 : -1
 
   try { 
     await eventsApi.update(props.event.id, { join: isJoining }) 
   }
   catch { 
     joined.value = !isJoining
-    if (props.event.participants_count !== undefined) {
-      props.event.participants_count += isJoining ? -1 : 1
-    }
+    realTimeParticipantCount.value += isJoining ? -1 : 1
   }
 }
+
+onMounted(() => {
+  echo.channel('events')
+    .listen('.participants.updated', (e) => {
+      if (e.eventId === props.event.id) {
+        realTimeParticipantCount.value = e.participantCount
+      }
+    })
+})
+
+onUnmounted(() => {
+  echo.leaveChannel('events')
+})
 </script>

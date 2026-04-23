@@ -14,7 +14,9 @@ const echo = new Echo({
   authEndpoint: '/api/broadcasting/auth',
   auth: {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('bssahty_token')}`,
+      Authorization: {
+        toString: () => `Bearer ${localStorage.getItem('bssahty_token')}`
+      },
       Accept: 'application/json',
     },
   },

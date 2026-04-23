@@ -25,6 +25,12 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const auth = useAuthStore()
+  
+  // Update Title
+  const baseTitle = 'B-SSAHTY'
+  const pageTitle = to.name ? to.name.charAt(0).toUpperCase() + to.name.slice(1) : ''
+  document.title = pageTitle ? `${pageTitle} | ${baseTitle}` : baseTitle
+
   if (to.meta.auth  && !auth.isLoggedIn) return { name: 'login' }
   if (to.meta.guest && auth.isLoggedIn)  return { name: 'feed' }
   if (to.meta.admin && auth.user?.role !== 'ADMIN') return { name: 'feed' }

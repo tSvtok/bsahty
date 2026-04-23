@@ -1,212 +1,177 @@
 <template>
-  <div class="h-screen flex flex-col overflow-hidden">
+  <div class="page-wrapper">
     <Navbar />
-    <div class="flex flex-1 pt-[64px] overflow-hidden">
-    <!-- SideNavBar - Nearby Spots -->
-    <aside class="w-[400px] bg-white border-r border-slate-200 z-40 overflow-y-auto hidden lg:block shadow-xl">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="font-headline text-2xl font-bold text-on-surface">Nearby Spots</h2>
-          <button class="text-primary font-bold flex items-center gap-1">
-            <span class="material-symbols-outlined text-sm">tune</span>
-            Filter
-          </button>
+    <div class="main-layout">
+      <AppSidebar />
+
+      <main class="flex-1 flex flex-col gap-0 overflow-hidden">
+        <!-- Top bar -->
+        <div class="px-4 md:px-6 py-4 bg-white border-b border-gray-100 flex items-center gap-3">
+          <h1 class="text-lg font-bold">Sport Spots & Active Games</h1>
+          <div class="flex-1" />
+          <div class="flex items-center gap-2">
+            <button @click="showSuggest = true" class="btn-secondary !py-1.5 !px-4 !text-sm flex items-center gap-1.5 border-orange-200 text-orange-600">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Suggest Spot
+            </button>
+            <button @click="locateMe" class="btn-secondary !py-1.5 !px-4 !text-sm flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Near Me
+            </button>
+          </div>
         </div>
-        <!-- Spot Categories -->
-        <div class="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-          <span v-for="category in categories" :key="category" :class="[category === 'All Sports' ? 'bg-primary-container text-on-primary' : 'bg-surface border border-outline-variant text-on-surface-variant hover:bg-slate-100']" class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer transition-colors">
-            {{ category }}
-          </span>
-        </div>
-        <!-- Spot List -->
-        <div class="space-y-4">
-          <div v-for="spot in spots" :key="spot.id" :class="[spot.active ? 'border-2 border-primary bg-orange-50/50' : 'border border-outline-variant hover:border-primary bg-white']" class="p-4 rounded-xl transition-all cursor-pointer group">
-            <div class="flex gap-4">
-              <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <img :alt="spot.name" class="w-full h-full object-cover" :src="spot.image"/>
+
+        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden" style="min-height: calc(100vh - 9.5rem);">
+          <!-- Map -->
+          <div ref="mapEl" class="flex-1 z-0 min-h-[400px] lg:min-h-0" />
+
+          <!-- Spots panel -->
+          <div class="w-full lg:w-80 shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-gray-100 bg-white overflow-y-auto max-h-[50vh] lg:max-h-none">
+            <div class="p-4 border-b border-gray-100">
+              <h2 class="font-semibold text-sm text-gray-600">Nearby Spots ({{ appStore.spots.length }})</h2>
+            </div>
+
+            <div v-if="appStore.spotsLoading" class="p-4 flex flex-col gap-3">
+              <div v-for="i in 4" :key="i" class="animate-pulse flex gap-3">
+                <div class="w-12 h-12 bg-gray-100 rounded-xl shrink-0" />
+                <div class="flex-1"><div class="h-3 bg-gray-100 rounded-full mb-2" /><div class="h-2 bg-gray-100 rounded-full w-2/3" /></div>
               </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-start">
-                  <h3 :class="[spot.active ? 'text-primary' : 'text-on-surface']" class="font-bold text-sm">{{ spot.name }}</h3>
-                  <span class="text-primary text-xs font-bold">{{ spot.distance }}</span>
+            </div>
+
+            <div v-else class="flex flex-col">
+              <div
+                v-for="spot in appStore.spots" :key="spot.id"
+                @click="flyTo(spot)"
+                class="flex items-start gap-3 p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors"
+              >
+                <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl shrink-0">
+                  {{ spotEmoji(spot.type) }}
                 </div>
-                <p class="text-xs text-secondary flex items-center gap-1 mt-1">
-                  <span class="material-symbols-outlined text-xs">location_on</span> {{ spot.address }}
-                </p>
-                <div class="flex items-center justify-between mt-2">
-                  <span v-if="spot.hot" class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">HOT GAME</span>
-                  <div v-else class="flex -space-x-2">
-                    <div v-for="i in 3" :key="i" class="w-6 h-6 rounded-full border-2 border-white bg-slate-200"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-sm truncate">{{ spot.name }}</p>
+                  <p class="text-xs text-gray-500 truncate">{{ spot.address || spot.type }}</p>
+                  <div class="flex items-center gap-1 mt-1">
+                    <span class="w-2 h-2 rounded-full" :class="spot.active ? 'bg-green-400' : 'bg-gray-300'" />
+                    <span class="text-xs text-gray-400">{{ spot.active ? 'Active now' : 'Inactive' }}</span>
                   </div>
-                  <span class="text-[10px] text-secondary font-medium">{{ spot.status }}</span>
                 </div>
+              </div>
+
+              <div v-if="!appStore.spots.length" class="p-8 text-center text-gray-400">
+                <div class="text-3xl mb-2">📍</div>
+                <p class="text-sm">No spots found. Try clicking "Near Me".</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </aside>
-
-    <!-- Map Interface -->
-    <section class="flex-1 relative bg-slate-200 overflow-hidden">
-      <div id="map" class="absolute inset-0 z-0"></div>
-
-      <!-- Map Controls Overlay -->
-      <div class="absolute bottom-10 right-10 flex flex-col gap-3 z-30">
-        <button class="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-on-surface hover:bg-slate-50 transition-colors">
-          <span class="material-symbols-outlined">add</span>
-        </button>
-        <button class="w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-on-surface hover:bg-slate-50 transition-colors">
-          <span class="material-symbols-outlined">remove</span>
-        </button>
-        <button class="w-12 h-12 bg-primary text-white rounded-xl shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity">
-          <span class="material-symbols-outlined">my_location</span>
-        </button>
-      </div>
-
-      <!-- Spot Detail Overlay -->
-      <div v-if="selectedSpot" class="absolute top-10 right-10 w-96 bg-white rounded-2xl shadow-2xl border border-outline-variant overflow-hidden z-40">
-        <div class="h-48 relative">
-          <img :alt="selectedSpot.name" class="w-full h-full object-cover" :src="selectedSpot.image"/>
-          <button @click="selectedSpot = null" class="absolute top-4 right-4 w-10 h-10 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/50 transition-colors">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-          <div class="absolute bottom-4 left-4">
-            <span class="px-3 py-1 bg-primary text-white rounded-full text-xs font-bold shadow-lg">Tennis</span>
-          </div>
-        </div>
-        <div class="p-6">
-          <h2 class="font-headline text-2xl font-bold text-on-surface mb-1">{{ selectedSpot.name }}</h2>
-          <p class="text-sm text-secondary flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-primary">location_on</span>
-            {{ selectedSpot.fullAddress }}
-          </p>
-          <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="bg-slate-50 p-3 rounded-xl text-center">
-              <p class="text-xs text-secondary">Courts</p>
-              <p class="font-headline text-2xl font-bold text-primary">12</p>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-xl text-center">
-              <p class="text-xs text-secondary">Rating</p>
-              <p class="font-headline text-2xl font-bold text-primary">4.8</p>
-            </div>
-          </div>
-          <div class="mb-6">
-            <h3 class="font-bold text-on-surface mb-3 flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary">question_answer</span>
-              Recent Questions
-            </h3>
-            <div class="space-y-3">
-              <div v-for="q in selectedSpot.questions" :key="q.id" class="bg-slate-50 p-3 rounded-lg border border-outline-variant">
-                <p class="text-xs font-bold text-on-surface mb-1">{{ q.text }}</p>
-                <p class="text-[10px] text-secondary">Asked by {{ q.author }} • {{ q.time }}</p>
-                <div v-if="q.answer" class="mt-2 flex items-center gap-2">
-                  <span class="material-symbols-outlined text-green-600 text-xs">check_circle</span>
-                  <span class="text-[10px] text-green-700 font-bold uppercase">Answered: {{ q.answer }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex gap-3">
-            <button class="flex-1 bg-primary text-white py-3 rounded-full font-bold shadow-lg shadow-orange-100 hover:opacity-90 active:scale-95 transition-all">
-              Join Game
-            </button>
-            <button class="w-12 h-12 border-2 border-outline rounded-full flex items-center justify-center text-primary hover:bg-orange-50 transition-colors">
-              <span class="material-symbols-outlined">share</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
+      </main>
+      <SuggestSpotModal 
+        v-model="showSuggest" 
+        :initial-lat="newSpotCoords?.lat" 
+        :initial-lng="newSpotCoords?.lng" 
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import Navbar from '../components/Navbar.vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import Navbar from '@/components/Navbar.vue'
+import AppSidebar from '@/components/AppSidebar.vue'
+import SuggestSpotModal from '@/modals/SuggestSpotModal.vue'
+import { useAppStore } from '@/stores/app'
 
-const categories = ['All Sports', 'Basketball', 'Tennis', 'Soccer']
-const selectedSpot = ref(null)
+const appStore = useAppStore()
+const mapEl    = ref(null)
+const showSuggest = ref(false)
+const newSpotCoords = ref(null)
+let leafletMap = null
 
-const spots = [
-  {
-    id: 1,
-    name: 'Brooklyn Bridge Courts',
-    lat: 40.7018,
-    lng: -73.9968,
-    distance: '0.4 mi',
-    address: 'Pier 2, Brooklyn',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCE1MmJ1-TbpmFp0a5R0hPrYXVJU7LgoTCsmLqg1D7dkqXxSAo2ZFilad_O-i4-NyXgIiHk-GkIzam63i0khDEfIjTwBRz_4KgwV2je56ZQJzabtEPHRoTBT1lReMIlUJPWjI5ekBxElT652hZK5fDf2blPw9mmqMk-_dhcSvS_q-Ookz_c8_Fnnyx6PzPkJ5Y5gzfiNvidIuh8HCwP67e-IF19Vcx3sofMo2o4xUAXnJmBiJ_Qdt81O91C5SaWY-tx-Vrr7vTkMOLZ',
-    active: false,
-    hot: false,
-    status: '12 active now',
-    fullAddress: 'Pier 2, Brooklyn, NY 11201',
-    questions: [
-      { id: 1, text: 'Are the lights working today?', author: 'Mike R.', time: '2h ago', answer: 'Yes' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'McCarren Park Tennis',
-    lat: 40.7215,
-    lng: -73.9515,
-    distance: '1.2 mi',
-    address: 'Williamsburg, Brooklyn',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAz4yJf5uA0Iam6f5W6NMsMZt-SFHl42GQYnBVMnIgnKA2JjP2miqXTEIbxtuMv8zyHzNQRwp_a3OWj1gk1LXm1zij8OMq6InaihqRQtYNMVhN3NZ-RSQQT966VPbYIe9WkwjCbJTY0o-lpjzifvIF-Gwa9YfWmQcsLDSqjfth5-YXZuiv0fbdpviI6FY8DyCakPFTl6IW9S0tR1qsEzBCsO9vyUQ2vFgxDxrD3g8iHC45Q6BPr0HSuk4t-yaq2l9PHcA6lIZt5X1j6',
-    active: true,
-    hot: true,
-    status: '8 slots available',
-    fullAddress: 'North 12th St, Brooklyn, NY 11211',
-    questions: [
-      { id: 1, text: 'Are the lights working today?', author: 'Mike R.', time: '2h ago', answer: 'Yes' },
-      { id: 2, text: 'Is there a waitlist for court 4?', author: 'Sarah L.', time: '5h ago' }
-    ]
-  },
-  {
-    id: 3,
-    name: 'Astoria Soccer Hub',
-    lat: 40.7762,
-    lng: -73.9242,
-    distance: '2.8 mi',
-    address: 'Astoria Park, Queens',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCHupKhVEFLaH1eNDM_AnoTbaye6u0Ugk6CcHttQwI_oEifMApcbureNauu9DpfgnuCCgXFSynbEK27XiBsWXirXvx-FpDTAQpQQPCE3eU2dGoySbl4UZtZ-GO3iF-oGwisuCOhCdVqwLAdWjYQlB06ubRIdUVrNr3CjMneEW9aiq-_OcizxwJQpH1k_ovil-Wrj8UBDj5OHbX8YaVXSIR02GvQ9PDsxQDH8nU_oKtLG-x3QIyPruWeE9fELM0lYEB3x-vhJUXbXF7S',
-    active: false,
-    hot: false,
-    status: 'Next match: 6:00 PM',
-    fullAddress: '19th St, Astoria, NY 11105',
-    questions: []
-  }
-]
+const spotEmoji = (type) => ({
+  gym: '🏋️', court: '🏀', stadium: '🏟', pool: '🏊',
+  park: '🌳', track: '🏃', default: '📍'
+}[type?.toLowerCase()] || '📍')
 
-let map = null
+onMounted(async () => {
+  await appStore.fetchSpots()
 
-onMounted(() => {
-  map = L.map('map').setView([40.72, -73.96], 13)
+  const L = (await import('leaflet')).default
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
-  }).addTo(map)
+  leafletMap = L.map(mapEl.value).setView([36.7538, 3.0588], 12)
 
-  spots.forEach(spot => {
-    const marker = L.marker([spot.lat, spot.lng]).addTo(map)
-    marker.on('click', () => {
-      selectedSpot.value = spot
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(leafletMap)
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(leafletMap)
+
+  // Markers layer group
+  const markersLayer = L.layerGroup().addTo(leafletMap)
+
+  // Watch for spots changes to update markers
+  watch(() => appStore.spots, (newSpots) => {
+    markersLayer.clearLayers()
+    const orange = L.divIcon({
+      html: `<div style="width:32px;height:32px;background:#f97316;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(249,115,22,.5);display:flex;align-items:center;justify-content:center;font-size:14px;">📍</div>`,
+      className: '', iconSize: [32, 32], iconAnchor: [16, 16],
     })
+
+    newSpots.forEach(spot => {
+      if (spot.lat && spot.lng) {
+        L.marker([spot.lat, spot.lng], { icon: orange })
+          .addTo(markersLayer)
+          .bindPopup(`<b>${spot.name}</b><br>${spot.address || spot.type}`)
+      }
+    })
+  }, { immediate: true })
+
+  // Handle map click to suggest spot
+
+  // Handle map click to suggest spot
+  leafletMap.on('click', (e) => {
+    const { lat, lng } = e.latlng
+    newSpotCoords.value = { lat, lng }
+    showSuggest.value = true
   })
 })
-</script>
 
-<style scoped>
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+async function locateMe() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.")
+    return
+  }
+  
+  navigator.geolocation.getCurrentPosition(
+    async ({ coords }) => {
+      const { latitude: lat, longitude: lng } = coords
+      console.log('Position found:', lat, lng)
+      if (leafletMap) {
+        leafletMap.setView([lat, lng], 15)
+        // Add a blue marker for user position
+        const L = (await import('leaflet')).default
+        L.circleMarker([lat, lng], {
+          radius: 8,
+          fillColor: "#3b82f6",
+          color: "#fff",
+          weight: 3,
+          fillOpacity: 1
+        }).addTo(leafletMap).bindPopup("You are here").openPopup()
+      }
+      await appStore.fetchNearby(lat, lng)
+    },
+    (err) => {
+      console.error('Geolocation error:', err)
+      alert("Could not get your location. Please ensure location services are enabled.")
+    },
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+  )
 }
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+function flyTo(spot) {
+  if (spot.lat && spot.lng) leafletMap?.flyTo([spot.lat, spot.lng], 16)
 }
-</style>
+
+onUnmounted(() => { leafletMap?.remove(); leafletMap = null })
+</script>

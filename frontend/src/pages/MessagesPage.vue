@@ -1,146 +1,104 @@
 <template>
-  <div class="bg-background text-on-surface min-h-screen">
+  <div class="page-wrapper">
     <Navbar />
-    
-    <div class="flex pt-16 max-w-screen-2xl mx-auto">
+    <div class="main-layout">
       <AppSidebar />
-      
-      <main class="flex-1 lg:ml-64 px-4 md:px-8 py-8 lg:pb-8 pb-32 space-y-8">
-        <!-- Search -->
-        <div class="relative group">
-          <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-          </div>
-          <input 
-            type="text" 
-            placeholder="Search conversations..." 
-            class="w-full h-16 pl-14 pr-6 bg-white border border-slate-100 rounded-3xl shadow-sm focus:ring-4 focus:ring-orange-50 focus:border-primary transition-all font-medium"
-          />
+
+      <main class="flex-1 py-6 px-4 md:px-6 max-w-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-black">Messages</h1>
+          <span class="badge badge-primary">{{ conversations.length }}</span>
         </div>
 
-      <!-- Filters -->
-      <div class="flex gap-3 overflow-x-auto hide-scrollbar py-2">
-        <button 
-          v-for="filter in ['All', 'Unread', 'Teams', 'Events']" 
-          :key="filter"
-          :class="[
-            'px-6 py-2.5 rounded-full font-bold text-sm transition-all whitespace-nowrap',
-            filter === 'All' ? 'bg-primary text-white shadow-md shadow-orange-100' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
-          ]"
-        >
-          {{ filter }}
-        </button>
-      </div>
+        <!-- Search convos -->
+        <div class="relative mb-4">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input v-model="searchTerm" type="text" placeholder="Search conversations..." class="input-field !pl-9" />
+        </div>
 
-      <!-- Conversations List -->
-      <section class="space-y-4">
-        <div 
-          v-for="chat in chats" 
-          :key="chat.id"
-          @click="goToChat(chat.id)"
-          class="flex items-center p-5 bg-white rounded-[32px] border border-slate-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
-        >
-          <div class="relative">
-            <img :src="chat.avatar" :alt="chat.name" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm group-hover:border-primary transition-colors"/>
-            <div v-if="chat.online" class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-4 border-white rounded-full"></div>
+        <!-- List -->
+        <div v-if="loading" class="flex flex-col gap-2">
+          <div v-for="i in 5" :key="i" class="card p-4 flex gap-3 animate-pulse">
+            <div class="w-12 h-12 rounded-full bg-gray-100 shrink-0" />
+            <div class="flex-1"><div class="h-3 bg-gray-100 rounded-full mb-2 w-1/2"/><div class="h-2 bg-gray-100 rounded-full w-3/4"/></div>
           </div>
-          
-          <div class="ml-5 flex-1 min-w-0">
-            <div class="flex justify-between items-baseline mb-1">
-              <h3 class="font-headline font-bold text-on-surface truncate">{{ chat.name }}</h3>
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ chat.time }}</span>
+        </div>
+
+        <div v-else-if="!filteredConversations.length" class="card p-10 text-center text-gray-400">
+          <div class="text-5xl mb-3">💬</div>
+          <p class="font-medium text-gray-700">No conversations yet</p>
+          <p class="text-sm mt-1">Connect with athletes and start chatting!</p>
+        </div>
+
+        <div v-else class="flex flex-col gap-3">
+          <router-link
+            v-for="c in filteredConversations"
+            :key="c.id"
+            :to="`/messages/${c.id}`"
+            class="card p-4 flex items-center gap-4 hover:shadow-lg hover:border-orange-200 transition-all cursor-pointer text-inherit no-underline group"
+          >
+            <div class="relative">
+              <img :src="getAvatar(c.other_user)" class="w-14 h-14 rounded-full object-cover ring-2 ring-gray-50 group-hover:ring-orange-100 transition-all" />
+              <div v-if="c.other_user?.is_online" class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+              <span v-if="c.unread_count" class="absolute -top-1 -right-1 min-w-[20px] h-5 bg-orange-500 rounded-full text-white text-[10px] font-black flex items-center justify-center px-1 ring-2 ring-white shadow-sm">
+                {{ c.unread_count > 9 ? '9+' : c.unread_count }}
+              </span>
             </div>
-            <p :class="[
-              'text-sm truncate transition-colors',
-              chat.unread ? 'font-bold text-on-surface' : 'text-slate-500'
-            ]">
-              {{ chat.lastMessage }}
-            </p>
-          </div>
-
-          <div v-if="chat.unread" class="ml-4">
-            <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-orange-200">
-              <span class="text-[10px] text-white font-black">{{ chat.unreadCount }}</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-0.5">
+                <p class="font-bold text-sm text-gray-900">{{ c.other_user?.name }}</p>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ formatTime(c.last_message?.created_at) }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <p class="text-sm text-gray-500 truncate" :class="{ 'font-semibold text-gray-900': c.unread_count }">
+                  <span v-if="c.last_message?.user_id === auth.user?.id" class="text-gray-400 mr-0.5">You:</span>
+                  {{ c.last_message?.body || 'No messages yet' }}
+                </p>
+              </div>
             </div>
-          </div>
-          <div v-else class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
-             <span class="material-symbols-outlined text-slate-300">chevron_right</span>
-          </div>
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg class="w-5 h-5 text-gray-300 group-hover:text-orange-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </router-link>
         </div>
-      </section>
-
-      <!-- Match Day Bento -->
-      <div class="p-8 bg-slate-900 rounded-[40px] text-white overflow-hidden relative shadow-2xl group">
-        <div class="relative z-10 space-y-4">
-          <div class="inline-block px-3 py-1 bg-primary text-white text-[10px] font-black rounded-full uppercase tracking-widest">Live Updates</div>
-          <h4 class="font-headline text-3xl font-bold leading-tight">Match Day<br/>is Here!</h4>
-          <p class="text-slate-400 text-sm">You have 2 games scheduled for today at Riverside.</p>
-          <button class="bg-white text-slate-900 px-6 py-3 rounded-2xl font-bold text-xs hover:bg-primary hover:text-white transition-all">VIEW SCHEDULE</button>
-        </div>
-        <div class="absolute -right-10 -bottom-10 opacity-20 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-1000">
-          <span class="material-symbols-outlined text-[200px]">sports_basketball</span>
-        </div>
-      </div>
-    </main>
-
-    <!-- FAB -->
-    <button class="fixed right-8 bottom-28 w-16 h-16 bg-primary text-white rounded-2xl shadow-2xl shadow-orange-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40">
-      <span class="material-symbols-outlined text-3xl">edit_square</span>
-    </button>
+      </main>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import Navbar from '../components/Navbar.vue'
-import AppSidebar from '../components/AppSidebar.vue'
+import { ref, computed, onMounted } from 'vue'
+import Navbar from '@/components/Navbar.vue'
+import AppSidebar from '@/components/AppSidebar.vue'
+import { messagingApi } from '@/services/api'
 
-const router = useRouter()
+const conversations = ref([])
+const loading       = ref(true)
+const searchTerm    = ref('')
 
-const chats = ref([
-  {
-    id: 1,
-    name: 'Marcus Chen',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB8SB2go5hBs0jHJxWlt8Na0FaeF84oq-A2MabVICG_mQnD2u_jujy43ulPZHd6tUaaC7IPs9zO286yJYzU2Rzqxo9tymST2hHaZR2GqpqmzXhhYvg1uZOA2kdFopdW0alYQxxt3vYV3n12Jl0OuuOaaBv4e8xFyygPvxMfnX3c-oFlyjko7vhrUxU2jKdvEZd9oB994iwz07x9IZojSBHsZIG2-1pUteJ7CpxPZA24irUqBkTHGh2sEYJ1SdGNSb1jawALvKapeax6',
-    lastMessage: 'Are we still playing tonight at 8?',
-    time: '2m ago',
-    unread: true,
-    unreadCount: 1,
-    online: true
-  },
-  {
-    id: 2,
-    name: 'Sarah Miller',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBOYNL6J4kvjKUyYiZjPBFsChM59fqVJTu36LRqy0Ayi1F9mowxiQzBJ-jxJHUGa5fBqU_toe7PcCLo4vQ0FGb1AwodS0OstYYnSPFEG63oCLLR4CO7b9bwhgiDHDJVPmyvxJuK2-WSHbITrUVWutKsEj91YAWqXBKhwkCFRrhf0z5fQvN1WXyvyO_bTp308mJWSgHlkkErZlQDRRYsKkpT7nNMzQ7IKaARjhvQvMbJmotw6hxY33AbKipPYPk0Xb9PMxvKM5qkThfx',
-    lastMessage: 'Thanks for the tips on the tennis racket!',
-    time: '1h ago',
-    unread: false,
-    online: false
-  },
-  {
-    id: 3,
-    name: 'Elena Rodriguez',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDoYPDYeKUjoRpudqnPBFZUx4qvCrcGLAhGw9AuVnBBLYEX4uMb5WMeyJPmjse57Hurm-51ZiBdTcBrAiO7jCXrHcnBsqNzVMPNp4dbcslvzmhwFcXOfLFMAnsLpniVhH8S7Zt30paciAK5t9QnSqsTgm7-cdL3tf5aSzaLmxL-WjeGJa6xHEBc-dElBzIpV4r5f9Y0bwh3KJ10waNuTBZxatCb1SIi4kmZcXr4QULVu70Yb0-IoOqIyoNiY2HShAXZ31UVQVKjtpr6',
-    lastMessage: 'Joined your 3v3 basketball event.',
-    time: '3h ago',
-    unread: false,
-    online: true
-  }
-])
+const filteredConversations = computed(() => {
+  if (!searchTerm.value) return conversations.value
+  return conversations.value.filter(c =>
+    c.other_user?.name?.toLowerCase().includes(searchTerm.value.toLowerCase())
+  )
+})
 
-const goToChat = (id) => {
-  router.push(`/messages/${id}`)
+function getAvatar(user) {
+  return user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'A')}&background=f97316&color=fff&size=80`
 }
+
+function formatTime(ts) {
+  if (!ts) return ''
+  const d = new Date(ts), diff = (Date.now() - d) / 1000
+  if (diff < 86400) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return d.toLocaleDateString()
+}
+
+onMounted(async () => {
+  try {
+    const res = await messagingApi.conversations()
+    conversations.value = res.data
+  } catch {}
+  finally { loading.value = false }
+})
 </script>
-
-<style scoped>
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>

@@ -1,184 +1,89 @@
 <template>
-  <div class="bg-background text-on-surface min-h-screen">
+  <div class="page-wrapper">
     <Navbar />
-    
-    <div class="flex pt-16 max-w-screen-2xl mx-auto">
+    <div class="main-layout">
       <AppSidebar />
-      
-      <main class="flex-1 lg:ml-64 px-4 md:px-8 py-8 lg:pb-8 pb-32">
-        <!-- Header & Filters -->
-        <header class="mb-10">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-            <div>
-              <h1 class="font-headline text-4xl font-bold tracking-tight text-on-surface">Discover Events</h1>
-              <p class="text-slate-500 mt-2">Find and join local sports matches near you.</p>
-            </div>
-            <button 
-              @click="showCreateModal = true"
-              class="btn-primary flex items-center gap-2 self-start md:self-center"
-            >
-              <span class="material-symbols-outlined">add</span>
-              CREATE EVENT
-            </button>
-          </div>
-          
-          <CreateEventModal :show="showCreateModal" @close="showCreateModal = false" @created="handleEventCreated" />
 
-        <!-- Sport Filter Bar -->
-        <div class="flex flex-col gap-4">
-          <div class="flex gap-3 overflow-x-auto hide-scrollbar py-2">
-            <button 
-              v-for="sport in sports" 
-              :key="sport"
-              @click="activeSport = sport"
-              :class="[
-                'flex-shrink-0 px-6 py-3 rounded-full font-bold text-sm transition-all active:scale-95',
-                activeSport === sport ? 'bg-primary text-white shadow-md shadow-orange-100' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
-              ]"
-            >
-              {{ sport }}
-            </button>
+      <main class="flex-1 py-6 px-4 md:px-6">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-2xl font-black">Local Matches</h1>
+            <p class="text-gray-500 text-sm mt-0.5">Find and join games happening near you</p>
           </div>
-          <div class="flex gap-3">
-            <button 
-              v-for="status in ['Open', 'Almost Full', 'Closed']" 
-              :key="status"
-              class="px-4 py-1.5 rounded-lg border border-slate-200 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:border-primary hover:text-primary transition-colors"
-            >
-              {{ status }}
-            </button>
+          <button @click="showCreate = true" class="btn-primary shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            Organize Match
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button
+            v-for="s in ['All', ...sports]" :key="s"
+            @click="filter = s"
+            class="px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
+            :class="filter === s ? 'bg-orange-500 text-white border-orange-500 shadow' : 'border-gray-200 text-gray-600 hover:border-orange-300 bg-white'"
+          >{{ s }}</button>
+        </div>
+
+        <!-- Events grid -->
+        <div v-if="appStore.eventsLoading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div v-for="i in 6" :key="i" class="card p-5 animate-pulse flex flex-col gap-3">
+            <div class="h-32 bg-gray-100 rounded-2xl mb-2" />
+            <div class="h-4 bg-gray-100 rounded-full w-3/4" />
+            <div class="flex gap-2">
+              <div class="h-5 bg-gray-50 rounded-full w-16" />
+              <div class="h-5 bg-gray-50 rounded-full w-16" />
+            </div>
+            <div class="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
+              <div class="h-3 bg-gray-50 rounded-full w-20" />
+              <div class="h-6 bg-gray-100 rounded-full w-16" />
+            </div>
           </div>
         </div>
-      </header>
 
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <template v-if="loading">
-          <EventSkeleton v-for="i in 6" :key="i" />
-        </template>
-        <template v-else>
-          <EventCard 
-            v-for="event in filteredEvents" 
-            :key="event.id" 
-            :event="event"
-            @join="joinEvent"
-          />
-        </template>
-      </section>
-    </main>
+        <div v-else-if="!filteredEvents.length" class="card p-12 text-center text-gray-400">
+          <div class="text-5xl mb-3">🏟</div>
+          <h3 class="font-semibold text-gray-700 mb-1">No events found</h3>
+          <p class="text-sm">Try a different sport or organize your own match!</p>
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <EventCard v-for="event in filteredEvents" :key="event.id" :event="event" />
+        </div>
+      </main>
+
+      <!-- Right sidebar -->
+      <aside class="w-72 shrink-0 hidden xl:block py-6 px-4">
+        <TrendingWidget />
+      </aside>
     </div>
+
+    <CreateEventModal v-model="showCreate" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import Navbar from '../components/Navbar.vue'
-import AppSidebar from '../components/AppSidebar.vue'
-import EventCard from '../components/EventCard.vue'
-import CreateEventModal from '../components/CreateEventModal.vue'
-import EventSkeleton from '../components/EventSkeleton.vue'
-import { EventService } from '../services/EventService'
+import Navbar from '@/components/Navbar.vue'
+import AppSidebar from '@/components/AppSidebar.vue'
+import EventCard from '@/components/EventCard.vue'
+import TrendingWidget from '@/components/TrendingWidget.vue'
+import CreateEventModal from '@/modals/CreateEventModal.vue'
+import { useAppStore } from '@/stores/app'
 
-const showCreateModal = ref(false)
-const loading = ref(true)
+const appStore   = useAppStore()
+const showCreate = ref(false)
+const filter     = ref('All')
 
-const activeSport = ref('All')
-const sports = ['All', 'Football', 'Basketball', 'Tennis', 'Padel', 'Volleyball', 'Running']
+const sports = ['Football', 'Basketball', 'Tennis', 'Volleyball', 'Running', 'Cycling', 'Padel']
 
-const handleEventCreated = (newEvent) => {
-  events.value.unshift(newEvent)
-}
+const filteredEvents = computed(() =>
+  filter.value === 'All'
+    ? appStore.events
+    : appStore.events.filter(e => e.sport === filter.value)
+)
 
-onMounted(async () => {
-  try {
-    const response = await EventService.getAll()
-    if (response.data && response.data.length > 0) {
-      events.value = response.data.map(e => ({
-        id: e.id,
-        title: e.title || 'Community Match',
-        sport: e.sport || 'General',
-        location: e.location || 'Local Court',
-        date: e.date ? new Date(e.date).toLocaleDateString('en-US', { month: 'SHORT', day: 'numeric' }) : 'TBD',
-        time: e.date ? new Date(e.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : '00:00',
-        participants: e.participants_count || 1,
-        maxParticipants: e.max_participants,
-        status: e.status || 'Open',
-        image: e.image || 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=800'
-      }))
-    }
-  } catch (error) {
-    console.error('Failed to fetch real events, using mocks:', error)
-  } finally {
-    loading.value = false
-  }
-})
-
-const events = ref([
-  {
-    id: 1,
-    title: 'Sunset Pro-Am Pickup',
-    sport: 'Basketball',
-    location: 'Riverside Community Court',
-    date: 'OCT 24',
-    time: '18:30',
-    participants: 8,
-    maxParticipants: 10,
-    status: 'Open',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDjRJGLv8FnHiPB7WnmAyoXPt9AFrKwJFhtpvlcJy2R81tFu8vWrGv3MzBbV_6QXtDSuarjRjwADizQpVXO2YkQ7Waz-vtlHD_YFC3cMIQmFGN6kFvb8A609eUVAbTPcw1eGscdSJcK96jl_g5rOn7yqAmvfWchdnI3Vexx_frQ9iDjUvrAtx8269O2KAC_H-syjTHrKAGis5nWQoD5FJZAMj4HsO_rAyspTbaqVG6R_XAdA_Lij-O1uayiktfn5R5u2HhoVLs1Lq3Z'
-  },
-  {
-    id: 2,
-    title: 'Champions League Night',
-    sport: 'Football',
-    location: 'Starlight Arena Pitch 4',
-    date: 'OCT 25',
-    time: '20:00',
-    participants: 12,
-    maxParticipants: 22,
-    status: 'Open',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhtgjR5VyCMWY8kX6aI9ZiuH38gM9yOcUY6Irca7DD0jlTvnU-LgU2F67L4avhWiIU38Ol4PQaRevzcJO0K9B-A4gu4Ag8KOh4qFYCaX7Ned0nH7dKzBNyzXbcpU5zqlehz1b83fpIEvvBJ7w5hghFHT1MHNDM0PMQ7gg6CGr-pNkHE6dyZxjcTXcKlQYXECEEH9MSlpa_00xQy6EzJGwmltNpJqE9phLZioSLr20FlGcjTlQd0X7ce-baU2me85OKsTTE_Rc-lk0k'
-  },
-  {
-    id: 3,
-    title: 'Doubles Warm-up Session',
-    sport: 'Tennis',
-    location: 'Grand Slam Club Courts',
-    date: 'OCT 26',
-    time: '09:00',
-    participants: 4,
-    maxParticipants: 4,
-    status: 'Full',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBN1Q-p9Q3sZcTXnGUaZOrrIAUPXz4sUq_EBwSfxaoGf1TyTITf7mduuEHqHHD3Y942-GMPQIFQyQG_1FW3xEIogJjLJf4oREFuNeG2SSBFZQQ3vQSSo5Ja6RO19HzmWglTjVMy-1PGua2UgmVXHC2dbjYkX0ma7GZNtBuPQN0UWI3ElzohpXnqnflEqat1SQLaIbrVJngQqpm6cDxHrNTVr6C6NLT1bhSZdHtdy4QUu5VO3pMiYyVw6LPoAXYahksP-4LM2lZ6xmSy'
-  },
-  {
-    id: 4,
-    title: 'Morning Beach Volley',
-    sport: 'Volleyball',
-    location: 'Sunny Beach Court 2',
-    date: 'OCT 27',
-    time: '08:00',
-    participants: 6,
-    maxParticipants: 12,
-    status: 'Open',
-    image: 'https://images.unsplash.com/photo-1592656670411-2918d7db425a?auto=format&fit=crop&q=80&w=800'
-  }
-])
-
-const filteredEvents = computed(() => {
-  if (activeSport.value === 'All') return events.value
-  return events.value.filter(e => e.sport === activeSport.value)
-})
-
-const joinEvent = (id) => {
-  console.log('Joining event:', id)
-}
+onMounted(() => appStore.fetchEvents())
 </script>
-
-<style scoped>
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>

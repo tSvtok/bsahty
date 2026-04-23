@@ -1,68 +1,70 @@
 <template>
-  <div class="bg-background text-on-surface min-h-screen flex flex-col">
-    <!-- Header -->
-    <header v-if="conversation" class="fixed top-0 left-0 w-full z-50 flex items-center px-6 h-16 bg-white/80 backdrop-blur-xl border-b border-slate-100 shadow-sm">
-      <div class="flex items-center justify-between max-w-4xl mx-auto w-full">
-        <div class="flex items-center gap-4">
-          <button @click="router.back()" class="p-2 rounded-full hover:bg-slate-50 transition-all active:scale-90">
-            <span class="material-symbols-outlined text-primary">arrow_back</span>
+  <div class="page-wrapper flex flex-col" style="height: 100vh;">
+    <Navbar />
+
+    <!-- Chat layout -->
+    <div class="flex flex-1 overflow-hidden pt-16">
+      <!-- Back + header -->
+      <div class="flex flex-col flex-1 max-w-2xl mx-auto w-full">
+        <!-- Chat header -->
+        <div class="px-4 py-3 bg-white border-b border-gray-100 flex items-center gap-3 shrink-0">
+          <router-link to="/messages" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </router-link>
+          <img :src="otherAvatar" class="w-9 h-9 rounded-full object-cover" />
+          <div>
+            <p class="font-semibold text-sm">{{ otherUser?.name || 'Athlete' }}</p>
+            <p class="text-xs text-green-500 font-medium">Online</p>
+          </div>
+          <div class="flex-1" />
+          <button class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/></svg>
           </button>
-          <div class="flex items-center gap-3">
-            <div class="relative">
-              <img :src="conversation.avatar" class="w-10 h-10 rounded-full border-2 border-primary shadow-sm" />
-              <div :class="[conversation.status === 'Online' ? 'bg-green-500' : 'bg-slate-400']" class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full"></div>
+        </div>
+
+        <!-- Messages -->
+        <div ref="messagesEl" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 bg-gray-50">
+          <div v-if="loading" class="flex justify-center items-center h-full">
+            <div class="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+
+          <template v-else>
+            <div
+              v-for="msg in messages" :key="msg.id"
+              class="flex gap-2"
+              :class="isMe(msg) ? 'justify-end' : 'justify-start'"
+            >
+              <img v-if="!isMe(msg)" :src="otherAvatar" class="w-7 h-7 rounded-full object-cover shrink-0 mt-auto" />
+              <div
+                class="max-w-xs px-4 py-2.5 rounded-2xl text-sm leading-relaxed"
+                :class="isMe(msg)
+                  ? 'bg-orange-500 text-white rounded-br-md'
+                  : 'bg-white text-gray-800 shadow-sm rounded-bl-md'"
+              >
+                {{ msg.body }}
+                <p class="text-[10px] mt-1 opacity-60 text-right">{{ formatTime(msg.created_at) }}</p>
+              </div>
             </div>
-            <div>
-              <h2 class="font-headline font-bold text-on-surface leading-none">{{ conversation.name }}</h2>
-              <p :class="[conversation.status === 'Online' ? 'text-green-500' : 'text-slate-400']" class="text-[10px] font-black uppercase tracking-widest mt-0.5">{{ conversation.status }}</p>
-            </div>
-          </div>
+          </template>
         </div>
-        <div class="flex gap-2">
-          <button class="p-2 hover:bg-slate-50 rounded-full text-slate-400"><span class="material-symbols-outlined">videocam</span></button>
-          <button class="p-2 hover:bg-slate-50 rounded-full text-slate-400"><span class="material-symbols-outlined">call</span></button>
-        </div>
-      </div>
-    </header>
 
-    <main v-if="conversation" class="flex-1 max-w-4xl mx-auto w-full pt-20 pb-40 px-6 overflow-y-auto space-y-8 hide-scrollbar">
-      <div class="flex justify-center">
-        <span class="text-[10px] font-black text-slate-400 bg-slate-50 px-4 py-1.5 rounded-full uppercase tracking-[0.2em]">Conversation History</span>
-      </div>
-
-      <div v-for="msg in conversation.messages" :key="msg.id" :class="[msg.sender === 'me' ? 'items-end' : 'items-start']" class="flex flex-col space-y-2">
-        <div class="flex items-end gap-3" :class="msg.sender === 'me' ? 'flex-row-reverse' : ''">
-          <img v-if="msg.sender !== 'me'" :src="conversation.avatar" class="w-8 h-8 rounded-full border border-slate-100 shadow-sm" />
-          <div :class="[msg.sender === 'me' ? 'bg-primary text-white rounded-tr-none shadow-orange-100' : 'bg-white text-on-surface rounded-tl-none border border-slate-50 shadow-sm']" class="max-w-[80%] p-5 rounded-[28px]">
-            <p class="text-sm leading-relaxed">{{ msg.text }}</p>
-          </div>
-        </div>
-        <span :class="[msg.sender === 'me' ? 'mr-2' : 'ml-11']" class="text-[10px] font-bold text-slate-400">{{ msg.time }}</span>
-      </div>
-    </main>
-
-    <!-- Bottom Input -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-slate-100 p-6 z-40">
-      <div class="max-w-4xl mx-auto space-y-4">
-        <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-          <span v-for="tag in ['On my way! 🏃‍♂️', 'Can\'t wait! 🔥', 'Who else is coming? 🏀']" :key="tag" class="px-4 py-2 bg-slate-50 text-slate-500 text-[10px] font-bold rounded-full border border-slate-100 cursor-pointer hover:bg-primary hover:text-white hover:border-primary transition-all whitespace-nowrap">{{ tag }}</span>
-        </div>
-        <div class="flex items-center gap-4">
-          <button class="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition-all"><span class="material-symbols-outlined">add_circle</span></button>
-          <div class="flex-1 relative">
-            <input 
-              v-model="newMessage" 
-              @keyup.enter="handleSendMessage"
-              type="text" 
-              placeholder="Type a message..." 
-              class="w-full h-14 bg-slate-50 border-none rounded-2xl px-6 focus:ring-4 focus:ring-orange-50 text-sm font-medium" 
-            />
-          </div>
-          <button 
-            @click="handleSendMessage"
-            class="w-14 h-14 bg-primary text-white rounded-2xl shadow-xl shadow-orange-200 flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+        <!-- Input -->
+        <div class="px-4 py-3 bg-white border-t border-gray-100 flex items-center gap-2 shrink-0">
+          <input
+            v-model="newMessage"
+            @keydown.enter.prevent="sendMessage"
+            type="text"
+            placeholder="Type a message…"
+            class="flex-1 px-4 py-2.5 bg-gray-100 rounded-full text-sm border-none outline-none focus:bg-white focus:ring-2 focus:ring-orange-400/30 transition-all"
+          />
+          <button
+            @click="sendMessage"
+            :disabled="!newMessage.trim() || sending"
+            class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 disabled:opacity-50 transition-all shrink-0 shadow-md"
           >
-            <span class="material-symbols-outlined">send</span>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
           </button>
         </div>
       </div>
@@ -71,33 +73,68 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useMessageStore } from '../stores/messages'
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
+import Navbar from '@/components/Navbar.vue'
+import { messagingApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
-const route = useRoute()
-const router = useRouter()
-const messageStore = useMessageStore()
+const route       = useRoute()
+const auth        = useAuthStore()
+const messages    = ref([])
+const newMessage  = ref('')
+const loading     = ref(true)
+const sending     = ref(false)
+const messagesEl  = ref(null)
+const otherUser   = ref(null)
 
-const newMessage = ref('')
+const conversationId = computed(() => route.params.id)
 
-const conversation = computed(() => {
-  return messageStore.conversations.find(c => c.id === parseInt(route.params.id))
-})
+const otherAvatar = computed(() =>
+  otherUser.value?.avatar ||
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser.value?.name || 'A')}&background=f97316&color=fff&size=60`
+)
 
-const handleSendMessage = () => {
-  if (!newMessage.value.trim()) return
-  messageStore.sendMessage(route.params.id, newMessage.value)
+function isMe(msg) { return msg.sender_id === auth.user?.id }
+
+function formatTime(ts) {
+  if (!ts) return ''
+  return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+async function scrollToBottom() {
+  await nextTick()
+  if (messagesEl.value) messagesEl.value.scrollTop = messagesEl.value.scrollHeight
+}
+
+async function sendMessage() {
+  if (!newMessage.value.trim() || sending.value) return
+  const body = newMessage.value.trim()
   newMessage.value = ''
-}
-</script>
+  sending.value = true
 
-<style scoped>
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  // Optimistic
+  messages.value.push({ id: Date.now(), body, sender_id: auth.user?.id, created_at: new Date().toISOString() })
+  await scrollToBottom()
+
+  try {
+    await messagingApi.send({ conversation_id: conversationId.value, body })
+  } catch {
+    messages.value.pop()
+  } finally {
+    sending.value = false
+  }
 }
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>
+
+onMounted(async () => {
+  try {
+    const res  = await messagingApi.conversation(conversationId.value)
+    messages.value = res.data.messages || []
+    otherUser.value = res.data.other_user
+  } catch {}
+  finally {
+    loading.value = false
+    await scrollToBottom()
+  }
+})
+</script>

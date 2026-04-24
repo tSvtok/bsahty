@@ -52,7 +52,7 @@
               <div class="flex items-center gap-1">
                 <p class="text-sm text-gray-500 truncate" :class="{ 'font-semibold text-gray-900': c.unread_count }">
                   <span v-if="c.last_message?.user_id === auth.user?.id" class="text-gray-400 mr-0.5">You:</span>
-                  {{ c.last_message?.body || 'No messages yet' }}
+                  {{ c.last_message?.content || 'No messages yet' }}
                 </p>
               </div>
             </div>
@@ -71,7 +71,9 @@ import { ref, computed, onMounted } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import { messagingApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 
+const auth = useAuthStore()
 const conversations = ref([])
 const loading       = ref(true)
 const searchTerm    = ref('')
@@ -84,7 +86,7 @@ const filteredConversations = computed(() => {
 })
 
 function getAvatar(user) {
-  return user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'A')}&background=f97316&color=fff&size=80`
+  return user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'A')}&background=f97316&color=fff&size=80`
 }
 
 function formatTime(ts) {

@@ -97,7 +97,7 @@ function formatTime(ts) {
 onMounted(async () => {
   try {
     const res = await messagingApi.conversations()
-    conversations.value = res.data
+    conversations.value = res.data.data || []
   } catch {}
   finally { loading.value = false }
 })

@@ -8,7 +8,7 @@
         <!-- Cover + avatar -->
         <div class="card mb-6 overflow-hidden">
           <!-- Cover -->
-          <div class="h-24 sm:h-36 bg-gradient-to-br from-orange-400 to-orange-600 relative">
+          <div class="aspect-[3/1] bg-gradient-to-br from-orange-400 to-orange-600 relative overflow-hidden">
             <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800')] bg-cover bg-center" />
           </div>
 
@@ -42,14 +42,14 @@
             <p v-if="user?.bio" class="text-gray-700 text-sm mt-3 leading-relaxed">{{ user.bio }}</p>
 
             <!-- Location -->
-            <div v-if="auth.user?.location" class="flex items-center gap-1.5 text-sm text-gray-500 mt-2">
+            <div v-if="user?.location" class="flex items-center gap-1.5 text-sm text-gray-500 mt-2">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-              {{ auth.user.location }}
+              {{ user.location }}
             </div>
 
             <!-- Favorite sports -->
-            <div v-if="auth.user?.sports?.length" class="flex flex-wrap gap-2 mt-4">
-              <span v-for="s in auth.user.sports" :key="s" class="badge badge-primary">{{ s }}</span>
+            <div v-if="user?.sports?.length" class="flex flex-wrap gap-2 mt-4">
+              <span v-for="s in user.sports" :key="s" class="badge badge-primary">{{ s }}</span>
             </div>
           </div>
         </div>
@@ -105,11 +105,11 @@
                 </div>
                 <div class="flex gap-4">
                   <dt class="text-gray-500 w-32 shrink-0 font-medium">Location</dt>
-                  <dd class="text-gray-800">{{ auth.user?.location || '—' }}</dd>
+                  <dd class="text-gray-800">{{ user?.location || '—' }}</dd>
                 </div>
                 <div class="flex gap-4">
                   <dt class="text-gray-500 w-32 shrink-0 font-medium">Sports</dt>
-                  <dd class="text-gray-800">{{ auth.user?.sports?.join(', ') || '—' }}</dd>
+                  <dd class="text-gray-800">{{ user?.sports?.join(', ') || '—' }}</dd>
                 </div>
               </dl>
             </template>

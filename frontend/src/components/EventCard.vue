@@ -1,13 +1,22 @@
 <template>
   <article 
-    class="card p-5 flex flex-col gap-3 cursor-pointer group hover:border-orange-200 transition-all active:scale-[0.98]"
+    class="card overflow-hidden flex flex-col cursor-pointer group hover:border-orange-200 transition-all active:scale-[0.98]"
     @click="router.push(`/events/${event.id}`)"
   >
+    <!-- Cover Image -->
+    <div class="h-32 sm:h-40 relative overflow-hidden bg-gray-100">
+      <img v-if="event.image_url" :src="event.image_url" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+      <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 text-3xl opacity-50 group-hover:scale-125 transition-transform duration-500">
+        {{ sportEmoji }}
+      </div>
+      <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+    </div>
+
+    <div class="p-5 flex flex-col gap-3">
     <!-- Header row -->
     <div class="flex items-start justify-between gap-3">
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1">
-          <span class="text-2xl">{{ sportEmoji }}</span>
           <span class="badge badge-primary text-xs">{{ event.sport }}</span>
           <span v-if="event.level" class="badge badge-info text-xs">{{ event.level }}</span>
         </div>
@@ -60,7 +69,8 @@
         {{ joined ? 'Joined ' : (isFull ? 'Full' : 'Join') }}
       </button>
     </div>
-  </article>
+  </div>
+</article>
 </template>
 
 <script setup>
@@ -74,17 +84,17 @@ const router = useRouter()
 const joined = ref(props.event.is_joined || false)
 const realTimeParticipantCount = ref(props.event.participants_count || 0)
 
-const sportEmojiMap = {
-  football: '', basketball: '', tennis: '', volleyball: '',
-  swimming: '', running: '', cycling: '', padel: '', default: ''
-}
-
-const sportEmoji = computed(() => sportEmojiMap[props.event.sport?.toLowerCase()] || sportEmojiMap.default)
 const participantCount = computed(() => realTimeParticipantCount.value)
 const maxParticipants  = computed(() => props.event.max_participants || 10)
 const spotsLeft   = computed(() => maxParticipants.value - participantCount.value)
 const isFull      = computed(() => spotsLeft.value <= 0)
 const progressPct = computed(() => Math.min(100, (participantCount.value / maxParticipants.value) * 100))
+
+const sportEmojiMap = {
+  football: '⚽', basketball: '🏀', tennis: '🎾', volleyball: '🏐',
+  swimming: '🏊', running: '🏃', cycling: '🚲', padel: '🎾', default: '🏆'
+}
+const sportEmoji = computed(() => sportEmojiMap[props.event.sport?.toLowerCase()] || sportEmojiMap.default)
 
 const progressColor = computed(() => {
   if (progressPct.value >= 90) return 'bg-red-400'

@@ -132,14 +132,14 @@ const form = ref({
 })
 
 const sports = [
-  { name: 'Football',   emoji: '' },
-  { name: 'Basketball', emoji: '' },
-  { name: 'Tennis',     emoji: '' },
-  { name: 'Volleyball', emoji: '' },
-  { name: 'Running',    emoji: '' },
-  { name: 'Cycling',    emoji: '' },
-  { name: 'Padel',      emoji: '' },
-  { name: 'Swimming',   emoji: '' },
+  { name: 'Football',   emoji: '⚽' },
+  { name: 'Basketball', emoji: '🏀' },
+  { name: 'Tennis',     emoji: '🎾' },
+  { name: 'Volleyball', emoji: '🏐' },
+  { name: 'Running',    emoji: '🏃' },
+  { name: 'Cycling',    emoji: '🚲' },
+  { name: 'Padel',      emoji: '🎾' },
+  { name: 'Swimming',   emoji: '🏊' },
 ]
 
 function validate() {

@@ -26,9 +26,15 @@
         <div v-else class="space-y-6">
           <!-- Hero section -->
           <div class="relative h-48 sm:h-64 rounded-[2.5rem] overflow-hidden group shadow-2xl">
-            <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+            <!-- Background Image or Gradient -->
+            <div v-if="event.image_url" class="absolute inset-0">
+              <img :src="event.image_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Match Cover" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            </div>
+            <div v-else class="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
               <span class="text-7xl sm:text-9xl transform group-hover:scale-110 transition-transform duration-500">{{ sportEmoji }}</span>
             </div>
+            
             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
             <div class="absolute bottom-6 left-8 right-8 text-white">
               <div class="flex items-center gap-2 mb-2">
@@ -190,8 +196,8 @@ const error   = ref(null)
 const event   = ref(null)
 
 const sportEmojiMap = {
-  football: '', basketball: '', tennis: '', volleyball: '',
-  swimming: '', running: '', cycling: '', padel: '', default: ''
+  football: '⚽', basketball: '🏀', tennis: '🎾', volleyball: '🏐',
+  swimming: '🏊', running: '🏃', cycling: '🚲', padel: '🎾', default: '🏆'
 }
 
 const sportEmoji = computed(() => sportEmojiMap[event.value?.sport?.toLowerCase()] || sportEmojiMap.default)

@@ -13,13 +13,15 @@ class FriendshipController extends Controller
     {
         $user = $request->user();
         
+        $status = $request->input('status', FriendshipStatus::ACCEPTED->value);
+        
         // Get friends where status is accepted
         $friendships = Friendship::with(['user', 'friend'])
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                       ->orWhere('friend_id', $user->id);
             })
-            ->where('status', FriendshipStatus::ACCEPTED)
+            ->where('status', $status)
             ->get();
 
         return response()->json(['data' => $friendships]);

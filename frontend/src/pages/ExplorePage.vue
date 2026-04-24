@@ -86,18 +86,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 
+const route = useRoute()
 const auth = useAuthStore()
 const users = ref([])
 const friendships = ref([])
 const loading = ref(false)
-const searchQuery = ref('')
+const searchQuery = ref(route.query.q || '')
 const friendRequests = ref(new Set())
+
+watch(() => route.query.q, (newQ) => {
+  searchQuery.value = newQ || ''
+})
 
 const filteredUsers = computed(() => {
   return users.value.filter(u => {

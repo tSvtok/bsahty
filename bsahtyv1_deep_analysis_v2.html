@@ -1,0 +1,330 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.w{padding:1.2rem 0 2rem}
+.sec{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.08em;text-transform:uppercase;margin:1.8rem 0 .7rem}
+.sec:first-of-type{margin-top:0}
+.tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.tab{font-size:12px;padding:5px 14px;border-radius:20px;border:0.5px solid var(--color-border-secondary);cursor:pointer;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.tab.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary)}
+.panel{display:none}.panel.active{display:block}
+
+/* metrics */
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem}
+.m{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.8rem 1rem}
+.ml{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.mv{font-size:20px;font-weight:500}
+.g{color:#1D9E75}.a{color:#BA7517}.r{color:#E24B4A}.b{color:#378ADD}
+
+/* progress bars */
+.pi{margin-bottom:9px}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:13px}
+.pl{font-weight:500;color:var(--color-text-primary)}
+.pp{font-size:11px;color:var(--color-text-secondary)}
+.pb{height:6px;background:var(--color-background-secondary);border-radius:6px;overflow:hidden}
+.pf{height:100%;border-radius:6px}
+.gbar{background:#1D9E75}.abar{background:#BA7517}.rbar{background:#E24B4A}.bbar{background:#378ADD}
+
+/* cards */
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.2rem;margin-bottom:10px}
+
+/* bug rows */
+.br{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.br:last-child{border-bottom:none;padding-bottom:0}
+.badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:12px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.bc{background:#FCEBEB;color:#A32D2D}
+.bh{background:#FAEEDA;color:#854F0B}
+.bm{background:#E6F1FB;color:#185FA5}
+.bl{background:#EAF3DE;color:#3B6D11}
+.bfix{background:#EAF3DE;color:#3B6D11}
+.bt{font-size:13px;color:var(--color-text-primary);line-height:1.5}
+.bs{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+
+/* two col */
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.tc{grid-template-columns:1fr}}
+
+/* phase */
+.phase{border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:14px}
+.ptitle{font-size:13px;font-weight:500;margin-bottom:5px}
+.pitem{font-size:12px;color:var(--color-text-secondary);margin-bottom:3px;display:flex;gap:6px;align-items:flex-start}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+
+/* fix table */
+.ftable{width:100%;font-size:12px;border-collapse:collapse}
+.ftable th{font-weight:500;color:var(--color-text-secondary);text-align:left;padding:5px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ftable td{padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:top}
+.ftable tr:last-child td{border-bottom:none}
+
+/* resp grid */
+.rg{width:100%;font-size:12px;border-collapse:collapse}
+.rg th{font-weight:500;color:var(--color-text-secondary);padding:5px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-align:center}
+.rg th:first-child{text-align:left}
+.rg td{padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-align:center}
+.rg td:first-child{text-align:left;font-weight:500}
+.rg tr:last-child td{border-bottom:none}
+.ok{color:#1D9E75;font-weight:500}
+.warn{color:#BA7517;font-weight:500}
+.bad{color:#E24B4A;font-weight:500}
+</style>
+
+<div class="w">
+<p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:1.2rem">B-SSAHTY · sports social platform · Laravel 13 + Vue 3 + PostgreSQL · 22 commits · 70+ files analysed</p>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('overview',this)">Overview</button>
+  <button class="tab" onclick="show('bugs',this)">Bugs &amp; Issues</button>
+  <button class="tab" onclick="show('fixed',this)">What's Fixed</button>
+  <button class="tab" onclick="show('missing',this)">Missing Features</button>
+  <button class="tab" onclick="show('responsive',this)">Responsive</button>
+  <button class="tab" onclick="show('roadmap',this)">Roadmap</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="panel active">
+  <div class="sec">overall completion</div>
+  <div class="mrow">
+    <div class="m"><div class="ml">Overall</div><div class="mv a">72%</div></div>
+    <div class="m"><div class="ml">Backend</div><div class="mv g">80%</div></div>
+    <div class="m"><div class="ml">Frontend</div><div class="mv a">76%</div></div>
+    <div class="m"><div class="ml">Infrastructure</div><div class="mv g">85%</div></div>
+    <div class="m"><div class="ml">UI / Design</div><div class="mv a">72%</div></div>
+    <div class="m"><div class="ml">Data &amp; Tests</div><div class="mv r">35%</div></div>
+  </div>
+
+  <div class="sec">feature-by-feature breakdown</div>
+  <div class="card">
+    <div class="pi"><div class="ph"><span class="pl">Database schema &amp; migrations</span><span class="pp">95%</span></div><div class="pb"><div class="pf gbar" style="width:95%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Authentication (Sanctum)</span><span class="pp">90%</span></div><div class="pb"><div class="pf gbar" style="width:90%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">State management (Pinia)</span><span class="pp">90%</span></div><div class="pb"><div class="pf gbar" style="width:90%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">API controllers (12 total)</span><span class="pp">85%</span></div><div class="pb"><div class="pf gbar" style="width:85%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Core pages (6 pages)</span><span class="pp">85%</span></div><div class="pb"><div class="pf gbar" style="width:85%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Docker / infrastructure</span><span class="pp">85%</span></div><div class="pb"><div class="pf gbar" style="width:85%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Feed / questions / posts</span><span class="pp">80%</span></div><div class="pb"><div class="pf gbar" style="width:80%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Vue components (15+)</span><span class="pp">80%</span></div><div class="pb"><div class="pf gbar" style="width:80%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Friendships / social graph</span><span class="pp">70%</span></div><div class="pb"><div class="pf abar" style="width:70%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Events</span><span class="pp">60%</span></div><div class="pb"><div class="pf abar" style="width:60%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Map / spots</span><span class="pp">55%</span></div><div class="pb"><div class="pf abar" style="width:55%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Accessibility (WCAG AA)</span><span class="pp">55%</span></div><div class="pb"><div class="pf abar" style="width:55%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Messaging</span><span class="pp">30%</span></div><div class="pb"><div class="pf rbar" style="width:30%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Admin panel</span><span class="pp">10%</span></div><div class="pb"><div class="pf rbar" style="width:10%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">Real-time WebSockets (Reverb)</span><span class="pp">20%</span></div><div class="pb"><div class="pf rbar" style="width:20%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">PHPUnit test suite</span><span class="pp">0%</span></div><div class="pb"><div class="pf rbar" style="width:0%"></div></div></div>
+    <div class="pi"><div class="ph"><span class="pl">File upload system</span><span class="pp">0%</span></div><div class="pb"><div class="pf rbar" style="width:0%"></div></div></div>
+    <div class="pi" style="margin-bottom:0"><div class="ph"><span class="pl">Dark mode</span><span class="pp">0%</span></div><div class="pb"><div class="pf rbar" style="width:0%"></div></div></div>
+  </div>
+
+  <div class="sec">codebase stats</div>
+  <div class="mrow">
+    <div class="m"><div class="ml">Controllers</div><div class="mv b">12</div></div>
+    <div class="m"><div class="ml">Models</div><div class="mv b">9</div></div>
+    <div class="m"><div class="ml">Migrations</div><div class="mv b">16</div></div>
+    <div class="m"><div class="ml">Vue pages</div><div class="mv b">6</div></div>
+    <div class="m"><div class="ml">Components</div><div class="mv b">15+</div></div>
+    <div class="m"><div class="ml">API endpoints</div><div class="mv b">40+</div></div>
+    <div class="m"><div class="ml">Lines of code</div><div class="mv b">15k+</div></div>
+    <div class="m"><div class="ml">Issues found</div><div class="mv r">50+</div></div>
+  </div>
+</div>
+
+<!-- BUGS -->
+<div id="bugs" class="panel">
+  <div class="sec">critical — must fix immediately</div>
+  <div class="card">
+    <div class="br"><span class="badge bc">CRITICAL</span><div><div class="bt">Zero test coverage — PHPUnit installed but 0 tests written</div><div class="bs">All 12 controllers, 9 models, and 40+ endpoints have no safety net. Any change can silently break existing functionality.</div></div></div>
+    <div class="br"><span class="badge bc">CRITICAL</span><div><div class="bt">File upload system completely absent (0%)</div><div class="bs">No backend storage config, no image upload endpoints, no file validation. Users cannot upload avatars, post images, or event photos.</div></div></div>
+    <div class="br"><span class="badge bc">CRITICAL</span><div><div class="bt">Real-time messaging non-functional for end users</div><div class="bs">Laravel Reverb is configured but WebSocket delivery, read receipts, typing indicators and unread counts are all missing. Chat is a static skeleton.</div></div></div>
+    <div class="br" style="border:none;padding-bottom:0"><span class="badge bc">CRITICAL</span><div><div class="bt">Seed data nearly empty — only 1 spot exists in the DB</div><div class="bs">No test users, events, questions, friendships or geographic coordinates. Map, feed, and social features cannot be meaningfully tested or demoed.</div></div></div>
+  </div>
+
+  <div class="sec">high — should fix before launch</div>
+  <div class="card">
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">Token expiration causes silent 401s — users get logged out unexpectedly</div><div class="bs">No refresh token mechanism. The axios interceptor catches 401s and redirects to login, but there's no silent re-auth attempt first.</div></div></div>
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">No email verification or password reset flow</div><div class="bs">Users register with any email and have no recovery path. Missing: verification mails, reset tokens, welcome emails, mail queue jobs.</div></div></div>
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">PostCard like/reaction may silently fail (API payload mismatch)</div><div class="bs">Reaction endpoint expects a polymorphic <code>type</code> field. Frontend FeedPage handleLike() may be sending an incorrect payload structure.</div></div></div>
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">Authorization ownership checks incomplete in controllers</div><div class="bs">Explicit role checks were added to QuestionController and CommentController but other mutating endpoints (EventController, SpotController) lack full ownership guards — any authenticated user may edit others' data.</div></div></div>
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">No rate limiting or caching anywhere on the API</div><div class="bs">All 40+ endpoints are unthrottled. Repeated identical requests hit PostgreSQL every time. Open to brute force and DDoS.</div></div></div>
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">CORS config needs hardening before production</div><div class="bs">cors.php was created but allowed origins may still be too permissive. Needs explicit whitelist matching the production frontend URL only.</div></div></div>
+    <div class="br"><span class="badge bh">HIGH</span><div><div class="bt">Edit / delete own post not implemented</div><div class="bs">Users can create posts but no edit or delete UI exists. Soft deletes not configured on Question model. UpdateQuestionRequest was created but the full flow is incomplete.</div></div></div>
+    <div class="br" style="border:none;padding-bottom:0"><span class="badge bh">HIGH</span><div><div class="bt">Event RSVP / join functionality missing</div><div class="bs">Events show a participant count but users cannot join or leave. RSVP state is not tracked in the database.</div></div></div>
+  </div>
+
+  <div class="sec">medium — important quality issues</div>
+  <div class="card">
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">MapPage — spots panel not responsive on mobile</div><div class="bs">Leaflet map and side panel overlap on small screens. No mobile breakpoint defined for the stacked layout.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">ProfilePage stats grid broken / crowded on mobile</div><div class="bs">3-column stats grid with fixed-height cover image doesn't scale. Images have fixed heights incompatible with responsive viewports.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">Sidebar hidden on tablet (768–1024px) — no fallback navigation</div><div class="bs">Desktop sidebar is hidden at tablet breakpoints but no replacement nav appears. Users in this range have no way to navigate.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">Modal dialogs overflow on small screens (&lt;400px)</div><div class="bs">CreatePostModal, CreateEventModal, EditProfileModal use fixed padding that breaks on narrow viewports.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">Badge color contrast too low — fails WCAG AA</div><div class="bs">Sport category badges use rgba(249,115,22,0.12) background — extremely light, unreadable. Focus states missing on all interactive elements.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">Date formatting inconsistent across components</div><div class="bs">Some components show raw ISO strings, others format them. No shared date utility used consistently.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">Hover states not uniform across UI components</div><div class="bs">Mix of shadow values and transform scales. Secondary button hover only changes border color, lacks background fill change.</div></div></div>
+    <div class="br"><span class="badge bm">MEDIUM</span><div><div class="bt">Pagination metadata not fully consumed in frontend</div><div class="bs">Backend now paginates at 15 items. Frontend doesn't render page controls or infinite scroll, so only the first page is ever shown.</div></div></div>
+    <div class="br" style="border:none;padding-bottom:0"><span class="badge bm">MEDIUM</span><div><div class="bt">No API documentation (Swagger / OpenAPI)</div><div class="bs">40+ endpoints undocumented. Slows onboarding of any new developer and makes frontend-backend contract implicit.</div></div></div>
+  </div>
+</div>
+
+<!-- FIXED -->
+<div id="fixed" class="panel">
+  <div class="sec">confirmed fixed in repo</div>
+  <div class="card">
+    <table class="ftable">
+      <thead><tr><th>Fix</th><th>File(s) changed</th><th>Impact</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge bfix">FIXED</span> Spots lat/lng not exposed in API — map markers were broken</td><td>Spot model, new migration <code>change_spots_coordinates_to_json</code></td><td>Map now renders markers correctly</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> Mobile navbar had no hamburger menu</td><td>Navbar.vue</td><td>Authenticated users can navigate on mobile</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> Hardcoded "Alex Rivers" user in store</td><td>stores/user.js</td><td>User data now loads from backend /me endpoint</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> No CORS config — frontend API calls blocked</td><td>bootstrap/app.php, config/cors.php (created)</td><td>Frontend ↔ backend communication works</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> Missing UpdateQuestionRequest and UpdateEventRequest</td><td>Two new FormRequest classes created</td><td>Update endpoints now have proper validation</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> /me endpoint response format inconsistent</td><td>AuthController.php</td><td>Wrapped in data key — matches other endpoints</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> No pagination on questions/events endpoints</td><td>QuestionController, EventController</td><td>Paginated at 15 per page — better DB performance</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> Axios interceptor missing — no auto-logout on 401</td><td>services/api.js</td><td>Expired tokens now redirect to login automatically</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> Router guards missing — protected routes were open</td><td>main.js</td><td>Unauthenticated users redirected to login</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> Sidebar had no logout button</td><td>AppSidebar.vue</td><td>Users can now log out from the sidebar</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> FeedPage had no error state or like handler</td><td>FeedPage.vue, PostService.js</td><td>Errors shown to users; likes call the API</td></tr>
+        <tr><td><span class="badge bfix">FIXED</span> No .env.example files in either project</td><td>backend/.env.example, frontend/.env.example created</td><td>New devs can configure the project</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec">fix quality notes</div>
+  <div class="card" style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">
+    <p>12 fixes have been applied and documented. The CORS, auth flow, and navigation fixes are the most impactful — together they make the app actually runnable end-to-end for the first time. However, several of the "fixed" items (authorization checks, pagination) are only partially complete — they exist in some controllers but have not been applied uniformly across all endpoints.</p>
+  </div>
+</div>
+
+<!-- MISSING -->
+<div id="missing" class="panel">
+  <div class="tc">
+    <div>
+      <div class="sec">backend missing</div>
+      <div class="card">
+        <div class="br"><span class="badge bc" style="font-size:9px">0%</span><div><div class="bt" style="font-size:12px">PHPUnit test suite — models, controllers, endpoints</div></div></div>
+        <div class="br"><span class="badge bc" style="font-size:9px">0%</span><div><div class="bt" style="font-size:12px">File upload system (storage, validation, CDN)</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">20%</span><div><div class="bt" style="font-size:12px">WebSocket real-time messaging via Reverb</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">15%</span><div><div class="bt" style="font-size:12px">Email verification + password reset</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">0%</span><div><div class="bt" style="font-size:12px">Rate limiting + API response caching</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">10%</span><div><div class="bt" style="font-size:12px">Admin panel endpoints (users, moderation, analytics)</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">15%</span><div><div class="bt" style="font-size:12px">Full-text + geospatial search</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">0%</span><div><div class="bt" style="font-size:12px">API documentation (Swagger/OpenAPI)</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">30%</span><div><div class="bt" style="font-size:12px">Security hardening (XSS, input sanitization, 2FA)</div></div></div>
+        <div class="br" style="border:none;padding-bottom:0"><span class="badge bl" style="font-size:9px">50%</span><div><div class="bt" style="font-size:12px">Profile management endpoints (avatar, settings, privacy)</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec">frontend missing</div>
+      <div class="card">
+        <div class="br"><span class="badge bc" style="font-size:9px">5%</span><div><div class="bt" style="font-size:12px">Image upload UI (posts, events, avatar)</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">30%</span><div><div class="bt" style="font-size:12px">Real-time chat UI (WebSocket, read receipts)</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">55%</span><div><div class="bt" style="font-size:12px">Map full features (add spot, details popup, cluster)</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">70%</span><div><div class="bt" style="font-size:12px">Profile edit + avatar upload modal</div></div></div>
+        <div class="br"><span class="badge bh" style="font-size:9px">60%</span><div><div class="bt" style="font-size:12px">Event RSVP + participant management</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">10%</span><div><div class="bt" style="font-size:12px">Global search with autocomplete</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">15%</span><div><div class="bt" style="font-size:12px">Notifications bell + dropdown</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">0%</span><div><div class="bt" style="font-size:12px">Pagination controls / infinite scroll</div></div></div>
+        <div class="br"><span class="badge bm" style="font-size:9px">10%</span><div><div class="bt" style="font-size:12px">Admin dashboard UI</div></div></div>
+        <div class="br" style="border:none;padding-bottom:0"><span class="badge bl" style="font-size:9px">0%</span><div><div class="bt" style="font-size:12px">Dark mode (theme + toggle + OS preference)</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">data &amp; infrastructure missing</div>
+  <div class="card">
+    <div class="br"><span class="badge bc">MISSING</span><div><div class="bt">Seed data — only 1 spot seeded</div><div class="bs">Need 10+ users, 20+ events, 30+ posts, 15+ spots with real coordinates, friendship pairs, conversations, reactions</div></div></div>
+    <div class="br"><span class="badge bh">MISSING</span><div><div class="bt">CI/CD pipeline — no GitHub Actions configured</div><div class="bs">No automated tests on push, no deployment automation, no rollback strategy</div></div></div>
+    <div class="br"><span class="badge bm">MISSING</span><div><div class="bt">Production deployment config</div><div class="bs">No production Docker config, no SSL setup, no zero-downtime deploy strategy</div></div></div>
+    <div class="br" style="border:none;padding-bottom:0"><span class="badge bm">MISSING</span><div><div class="bt">Error monitoring + logging (Sentry / Horizon)</div><div class="bs">No application error tracking, no queue monitoring, no uptime alerting</div></div></div>
+  </div>
+</div>
+
+<!-- RESPONSIVE -->
+<div id="responsive" class="panel">
+  <div class="sec">responsive design matrix</div>
+  <div class="card">
+    <table class="rg">
+      <thead><tr><th>Component</th><th>Mobile (&lt;640px)</th><th>Tablet (640–1024px)</th><th>Desktop (&gt;1024px)</th></tr></thead>
+      <tbody>
+        <tr><td>Navbar</td><td class="ok">✓ Fixed</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Sidebar</td><td class="warn">⚠ Hidden</td><td class="bad">✗ No fallback</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Feed / Posts</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Events grid</td><td class="warn">⚠ Partial</td><td class="warn">⚠ Partial</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Map page</td><td class="bad">✗ Broken</td><td class="warn">⚠ Partial</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Profile page</td><td class="bad">✗ Crowded</td><td class="warn">⚠ Partial</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Modals</td><td class="warn">⚠ Overflow</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Messages</td><td class="warn">⚠ Partial</td><td class="warn">⚠ Partial</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Landing page</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td></tr>
+        <tr><td>Login / Register</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td><td class="ok">✓ OK</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec">specific responsive bugs</div>
+  <div class="card">
+    <div class="br"><span class="badge bc">MAP</span><div><div class="bt">Leaflet map + spots panel side-by-side on mobile — they overlap</div><div class="bs">Fix: add <code>flex-col</code> breakpoint so panel stacks below map on screens &lt; 640px</div></div></div>
+    <div class="br"><span class="badge bh">PROFILE</span><div><div class="bt">3-column stats grid with fixed cover image height breaks on mobile</div><div class="bs">Fix: switch to 2-col grid at sm breakpoint, use aspect-ratio instead of fixed height on cover image</div></div></div>
+    <div class="br"><span class="badge bh">SIDEBAR</span><div><div class="bt">No navigation at all on tablet (768–1024px)</div><div class="bs">Fix: show a collapsed icon-only sidebar or add a persistent bottom nav bar at this breakpoint</div></div></div>
+    <div class="br"><span class="badge bm">MODALS</span><div><div class="bt">CreatePost / CreateEvent / EditProfile modals overflow on &lt;400px</div><div class="bs">Fix: add <code>w-full max-w-lg mx-4</code> and replace fixed padding with responsive padding classes</div></div></div>
+    <div class="br"><span class="badge bm">IMAGES</span><div><div class="bt">PostCard and EventCard images use fixed pixel heights</div><div class="bs">Fix: replace with Tailwind aspect-ratio utilities (<code>aspect-video</code>, <code>aspect-square</code>)</div></div></div>
+    <div class="br" style="border:none;padding-bottom:0"><span class="badge bm">BADGES</span><div><div class="bt">Sport category badges too small to tap on mobile (&lt;44px touch target)</div><div class="bs">Fix: increase badge padding to at least <code>py-2 px-4</code> on mobile breakpoints</div></div></div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div id="roadmap" class="panel">
+  <div class="sec">implementation roadmap</div>
+  <div class="card">
+    <div class="phase" style="border-color:#E24B4A">
+      <div class="ptitle" style="color:#E24B4A">Phase 1 — critical (week 1–2)</div>
+      <div class="pitem"><div class="dot" style="background:#E24B4A"></div>Comprehensive seed data — 10+ users, 20+ events, 30+ posts, 15+ geo-tagged spots</div>
+      <div class="pitem"><div class="dot" style="background:#E24B4A"></div>File upload system — backend S3/local storage + frontend image pickers + avatar upload</div>
+      <div class="pitem"><div class="dot" style="background:#E24B4A"></div>Responsive fixes — MapPage stack, ProfilePage grid, Sidebar tablet fallback, Modal padding</div>
+      <div class="pitem"><div class="dot" style="background:#E24B4A"></div>Token refresh logic — silent re-auth before logout on 401 in axios interceptor</div>
+      <div class="pitem"><div class="dot" style="background:#E24B4A"></div>Pagination UI — implement page controls or infinite scroll to consume paginated API</div>
+    </div>
+    <div class="phase" style="border-color:#BA7517">
+      <div class="ptitle" style="color:#BA7517">Phase 2 — high (week 3–4)</div>
+      <div class="pitem"><div class="dot" style="background:#BA7517"></div>Real-time messaging — integrate Reverb WebSocket, add typing indicators + read receipts</div>
+      <div class="pitem"><div class="dot" style="background:#BA7517"></div>Profile edit modal + avatar upload + password change + privacy settings</div>
+      <div class="pitem"><div class="dot" style="background:#BA7517"></div>Map full features — add spot UI, spot details popup, geolocation, cluster markers</div>
+      <div class="pitem"><div class="dot" style="background:#BA7517"></div>Event RSVP — join/leave flow + waitlist + participant list view</div>
+      <div class="pitem"><div class="dot" style="background:#BA7517"></div>Authorization audit — apply ownership guards uniformly across all controllers</div>
+      <div class="pitem"><div class="dot" style="background:#BA7517"></div>Rate limiting (throttle middleware) + API response caching (Redis/array)</div>
+    </div>
+    <div class="phase" style="border-color:#378ADD">
+      <div class="ptitle" style="color:#378ADD">Phase 3 — medium (week 5–6)</div>
+      <div class="pitem"><div class="dot" style="background:#378ADD"></div>PHPUnit test suite — feature tests for all endpoints + model unit tests</div>
+      <div class="pitem"><div class="dot" style="background:#378ADD"></div>Email verification + password reset + welcome email queue</div>
+      <div class="pitem"><div class="dot" style="background:#378ADD"></div>Global search with autocomplete (users, events, posts)</div>
+      <div class="pitem"><div class="dot" style="background:#378ADD"></div>Notifications bell — in-app + email toggle + push foundations</div>
+      <div class="pitem"><div class="dot" style="background:#378ADD"></div>Admin panel — user management, content moderation, analytics dashboard</div>
+      <div class="pitem"><div class="dot" style="background:#378ADD"></div>Edit / delete own post + nested comments</div>
+    </div>
+    <div class="phase" style="border-color:var(--color-border-secondary);margin-bottom:0">
+      <div class="ptitle">Phase 4 — polish (week 7+)</div>
+      <div class="pitem"><div class="dot" style="background:var(--color-border-secondary)"></div>Dark mode — design tokens + toggle + OS preference detection + localStorage persistence</div>
+      <div class="pitem"><div class="dot" style="background:var(--color-border-secondary)"></div>Accessibility audit — ARIA labels, focus rings, keyboard nav, WCAG AA color contrast</div>
+      <div class="pitem"><div class="dot" style="background:var(--color-border-secondary)"></div>Performance — code splitting, bundle analysis, image optimization, query caching</div>
+      <div class="pitem"><div class="dot" style="background:var(--color-border-secondary)"></div>Swagger/OpenAPI docs + CI/CD pipeline (GitHub Actions)</div>
+      <div class="pitem"><div class="dot" style="background:var(--color-border-secondary)"></div>Production deployment config + SSL + zero-downtime strategy</div>
+    </div>
+  </div>
+
+  <div class="sec">estimated targets after each phase</div>
+  <div class="mrow">
+    <div class="m"><div class="ml">Now</div><div class="mv a">72%</div></div>
+    <div class="m"><div class="ml">After Phase 1</div><div class="mv a">80%</div></div>
+    <div class="m"><div class="ml">After Phase 2</div><div class="mv g">87%</div></div>
+    <div class="m"><div class="ml">After Phase 3</div><div class="mv g">93%</div></div>
+    <div class="m"><div class="ml">After Phase 4</div><div class="mv g">98%</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>

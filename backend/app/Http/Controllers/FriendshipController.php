@@ -59,12 +59,14 @@ class FriendshipController extends Controller
     {
         $request->validate(['status' => 'required|string']);
 
+        $status = $request->input('status');
+
         // Only the receiver can accept
-        if ($request->user()->id !== $friendship->friend_id && $request->status === FriendshipStatus::ACCEPTED->value) {
+        if ($status === FriendshipStatus::ACCEPTED->value && $request->user()->id !== $friendship->friend_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $friendship->update(['status' => $request->status]);
+        $friendship->update(['status' => $status]);
 
         return response()->json(['data' => $friendship]);
     }

@@ -9,7 +9,16 @@ class ConversationController extends Controller
 {
     public function index(Request $request)
     {
-        $conversations = $request->user()->conversations()->with('users')->get();
+        $user = $request->user();
+        $conversations = $user->conversations()
+            ->with(['users', 'lastMessage'])
+            ->get()
+            ->map(function ($convo) use ($user) {
+                $otherUser = $convo->users->where('id', '!=', $user->id)->first();
+                $convo->other_user = $otherUser;
+                return $convo;
+            });
+
         return response()->json(['data' => $conversations]);
     }
 
@@ -21,8 +30,21 @@ class ConversationController extends Controller
         ]);
 
         $userIds = $request->user_ids;
-        $userIds[] = $request->user()->id; // Include the creator
+        $userIds[] = $request->user()->id;
         $userIds = array_unique($userIds);
+        sort($userIds);
+
+        // For 1-on-1, check if exists
+        if (count($userIds) === 2) {
+            $existing = Conversation::has('users', 2)
+                ->whereHas('users', function ($q) use ($userIds) {
+                    $q->whereIn('user_id', $userIds);
+                }, '=', 2)->first();
+
+            if ($existing) {
+                return response()->json($existing->load('users'));
+            }
+        }
 
         $conversation = Conversation::create();
         $conversation->users()->attach($userIds);

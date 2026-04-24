@@ -21,7 +21,7 @@ class ReactionController extends Controller
 
         if ($existing) {
             // If they are reacting with the same type, toggle it (delete)
-            if ($existing->type->value === $validated['type']->value) {
+            if ($existing->type->value === $validated['type']) {
                 $existing->delete();
                 return response()->json(['message' => 'Reaction removed'], 200);
             }

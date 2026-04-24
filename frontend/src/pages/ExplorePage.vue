@@ -46,7 +46,7 @@
           <div v-for="user in filteredUsers" :key="user.id" class="card p-5 flex flex-col items-center text-center group hover:shadow-lg transition-all duration-300">
             <router-link :to="`/profile/${user.id}`" class="block relative mb-3">
               <img 
-                :src="user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=f97316&color=fff&size=120`" 
+                :src="user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=f97316&color=fff&size=120`" 
                 class="w-20 h-20 rounded-full object-cover ring-4 ring-gray-50 group-hover:ring-orange-100 transition-all"
               />
               <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full" />

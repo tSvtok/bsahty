@@ -3,25 +3,25 @@
     <transition name="modal-backdrop">
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
         @click.self="emit('update:modelValue', false)"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
         <!-- Panel -->
         <transition name="modal-content">
           <div
             v-if="modelValue"
-            class="relative bg-white rounded-3xl shadow-2xl w-full overflow-hidden"
+            class="relative bg-white rounded-[2rem] sm:rounded-3xl shadow-2xl w-full overflow-hidden mx-auto"
             :class="sizeClass"
           >
             <!-- Header -->
-            <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
-              <h2 class="text-xl font-bold">{{ title }}</h2>
+            <div class="flex items-center justify-between px-4 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-gray-100">
+              <h2 class="text-lg sm:text-xl font-bold">{{ title }}</h2>
               <button
                 @click="emit('update:modelValue', false)"
-                class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -30,7 +30,7 @@
             </div>
 
             <!-- Body -->
-            <div class="px-6 pb-6 pt-5 overflow-y-auto max-h-[80vh]">
+            <div class="px-4 sm:px-6 pb-6 pt-5 overflow-y-auto max-h-[85vh]">
               <slot />
             </div>
           </div>

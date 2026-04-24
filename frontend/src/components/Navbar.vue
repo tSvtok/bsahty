@@ -9,14 +9,17 @@
     <!-- Search Bar -->
     <div class="flex-1 max-w-md hidden md:block">
       <div class="relative">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <button @click="handleSearch" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors z-10">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
         <input
           v-model="search"
           type="text"
           placeholder="Search athletes, events, spots..."
           class="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-full text-sm border-none outline-none focus:bg-white focus:ring-2 focus:ring-orange-400/30 transition-all"
+          @keyup.enter="handleSearch"
         />
       </div>
     </div>
@@ -42,12 +45,40 @@
       </button>
 
       <!-- Notifications -->
-      <button v-if="auth.isLoggedIn" @click="hasNotifications = false" class="relative w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
-        <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-        <span v-if="hasNotifications" class="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full ring-2 ring-white"></span>
-      </button>
+      <div class="relative">
+        <button v-if="auth.isLoggedIn" @click="showNotifications = !showNotifications" class="relative w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+          <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span v-if="notifications.length > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full ring-2 ring-white"></span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <transition name="mobile-menu">
+          <div v-if="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 class="font-bold text-sm">Notifications</h3>
+              <button @click="notifications = []" class="text-xs text-orange-500 font-medium hover:underline">Clear all</button>
+            </div>
+            <div class="max-h-96 overflow-y-auto">
+              <div v-if="notifications.length === 0" class="p-8 text-center text-gray-400">
+                <p class="text-xs">No new notifications</p>
+              </div>
+              <div v-for="(n, i) in notifications" :key="i" class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors flex gap-3">
+                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-lg shrink-0">
+                  {{ n.icon }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-800 leading-tight">
+                    <span class="font-bold">{{ n.title }}</span> {{ n.body }}
+                  </p>
+                  <p class="text-[10px] text-gray-400 mt-1">{{ n.time }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
 
       <!-- Avatar / Auth buttons -->
       <template v-if="auth.isLoggedIn">
@@ -102,13 +133,28 @@ import { ref, computed, h, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import echo from '@/services/echo'
+import api from '@/services/api'
 
 const auth = useAuthStore()
 const router = useRouter()
 const search = ref('')
 const showMobileMenu = ref(false)
-const hasNotifications = ref(false)
+const showNotifications = ref(false)
+const notifications = ref([])
 const isScrolled = ref(false)
+
+function addNotification(n) {
+  notifications.value.unshift({
+    ...n,
+    time: 'Just now'
+  })
+}
+
+function handleSearch() {
+  if (!search.value.trim()) return
+  router.push({ path: '/explore', query: { q: search.value.trim() } })
+  search.value = ''
+}
 
 const avatar = computed(() =>
   auth.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user?.name || 'A')}&background=f97316&color=fff`
@@ -133,7 +179,28 @@ function setupEcho() {
 
   echo.private(`user.${auth.user.id}`)
     .listen('.friend.request', (e) => {
-      hasNotifications.value = true
+      addNotification({
+        title: 'Friend Request',
+        body: 'Someone sent you a friend request!',
+        icon: '👤'
+      })
+    })
+    .listen('.message.new', (e) => {
+      addNotification({
+        title: 'New Message',
+        body: `You received a new message in a conversation.`,
+        icon: '💬'
+      })
+    })
+
+  // Public events
+  echo.channel('events')
+    .listen('.event.created', (e) => {
+      addNotification({
+        title: 'New Event',
+        body: `${e.event.organizer?.name || 'Someone'} organized a new ${e.event.sport} match!`,
+        icon: '⚽'
+      })
     })
 }
 
@@ -142,8 +209,26 @@ watch(() => auth.user?.id, (newId) => {
   else echo.leave(`user.${auth.user?.id}`)
 })
 
+async function fetchPendingRequests() {
+  try {
+    const res = await api.get('/friendships?status=PENDING')
+    const pending = res.data.data
+    pending.forEach(f => {
+      // Only show if I am the receiver
+      if (f.friend_id === auth.user?.id) {
+        addNotification({
+          title: 'Pending Request',
+          body: `${f.user?.name || 'Someone'} wants to be your friend!`,
+          icon: '👤'
+        })
+      }
+    })
+  } catch (err) { console.error(err) }
+}
+
 onMounted(() => {
   setupEcho()
+  fetchPendingRequests()
   window.addEventListener('scroll', handleScroll)
 })
 

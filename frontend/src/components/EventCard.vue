@@ -5,7 +5,12 @@
   >
     <!-- Cover Image -->
     <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-100">
-      <img v-if="displayImage" :src="displayImage" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+      <img 
+        v-if="displayImage" 
+        :src="displayImage" 
+        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+        @error="(e) => e.target.src = sportImageMap.default"
+      />
       
       <!-- Gradient Overlay -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
@@ -105,6 +110,7 @@ const sportImageMap = {
   running: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800',
   cycling: 'https://images.unsplash.com/photo-1483721310020-03333e577078?w=800',
   padel: 'https://images.unsplash.com/photo-1626245917164-326e033e6f98?w=800',
+  swimming: 'https://images.unsplash.com/photo-1530549387074-d56a99e142e0?w=800',
   default: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800'
 }
 

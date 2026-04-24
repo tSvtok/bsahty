@@ -28,7 +28,12 @@
           <div class="relative h-48 sm:h-64 rounded-[2.5rem] overflow-hidden group shadow-2xl">
             <!-- Background Image or Gradient -->
             <div class="absolute inset-0">
-              <img :src="displayImage" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Match Cover" />
+              <img 
+                :src="displayImage" 
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                alt="Match Cover" 
+                @error="(e) => e.target.src = sportImageMap.default"
+              />
               <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             </div>
             
@@ -200,6 +205,7 @@ const sportImageMap = {
   running: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800',
   cycling: 'https://images.unsplash.com/photo-1483721310020-03333e577078?w=800',
   padel: 'https://images.unsplash.com/photo-1626245917164-326e033e6f98?w=800',
+  swimming: 'https://images.unsplash.com/photo-1530549387074-d56a99e142e0?w=800',
   default: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800'
 }
 

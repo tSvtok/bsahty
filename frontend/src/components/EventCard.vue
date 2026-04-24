@@ -113,8 +113,9 @@ const formattedDate = computed(() => {
 })
 
 const formattedTime = computed(() => {
-  if (!props.event.time) return ''
-  return props.event.time.slice(0, 5)
+  if (!props.event.date) return ''
+  const date = new Date(props.event.date)
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
 })
 
 async function handleJoin() {

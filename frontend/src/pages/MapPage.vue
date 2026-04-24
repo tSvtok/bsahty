@@ -113,11 +113,8 @@ import AppSidebar from '@/components/AppSidebar.vue'
 import SuggestSpotModal from '@/modals/SuggestSpotModal.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { useAppStore } from '@/stores/app'
-import { useAuthStore } from '@/stores/auth'
-import api from '@/services/api'
 
 const appStore = useAppStore()
-const auth     = useAuthStore()
 const mapEl    = ref(null)
 const showSuggest = ref(false)
 const showMobileList = ref(false)
@@ -220,57 +217,39 @@ onMounted(async () => {
 
 async function locateMe() {
   if (!navigator.geolocation) {
-    fallbackToCity()
+    alert("Geolocation is not supported by your browser.")
     return
   }
   
   navigator.geolocation.getCurrentPosition(
     async ({ coords }) => {
       const { latitude: lat, longitude: lng } = coords
-      applyLocation(lat, lng)
+      userCoords.value = { lat, lng }
+      console.log('Position found:', lat, lng)
+      if (leafletMap) {
+        leafletMap.setView([lat, lng], 15)
+        // Add a blue marker for user position
+        const L = (await import('leaflet')).default
+        L.circleMarker([lat, lng], {
+          radius: 8,
+          fillColor: "#3b82f6",
+          color: "#fff",
+          weight: 3,
+          fillOpacity: 1
+        }).addTo(leafletMap).bindPopup("You are here").openPopup()
+      }
+      await appStore.fetchNearby(lat, lng)
     },
     (err) => {
       console.error('Geolocation error:', err)
-      fallbackToCity()
+      let msg = "Could not get your location."
+      if (err.code === 1) msg = "Location access was denied. Please check your browser settings."
+      if (err.code === 2) msg = "Location unavailable. Your device might not have a GPS signal."
+      if (err.code === 3) msg = "Location request timed out. Please try again."
+      alert(msg)
     },
-    { enableHighAccuracy: false, timeout: 5000, maximumAge: Infinity }
+    { enableHighAccuracy: false, timeout: 20000, maximumAge: Infinity }
   )
-}
-
-async function fallbackToCity() {
-  const city = auth.user?.city
-  if (!city) {
-    alert("Could not get your location. Please set your city in your profile.")
-    return
-  }
-
-  try {
-    const res = await api.get('/geocode', { params: { address: city } })
-    const { lat, lng } = res.data.data
-    if (lat && lng) {
-      applyLocation(lat, lng, `Showing spots in ${city}`)
-    } else {
-      throw new Error('Geocoding failed')
-    }
-  } catch (e) {
-    alert("Could not find your city on the map.")
-  }
-}
-
-async function applyLocation(lat, lng, popupMsg = "You are here") {
-  userCoords.value = { lat, lng }
-  if (leafletMap) {
-    leafletMap.setView([lat, lng], 13)
-    const L = (await import('leaflet')).default
-    L.circleMarker([lat, lng], {
-      radius: 8,
-      fillColor: "#3b82f6",
-      color: "#fff",
-      weight: 3,
-      fillOpacity: 1
-    }).addTo(leafletMap).bindPopup(popupMsg).openPopup()
-  }
-  await appStore.fetchNearby(lat, lng)
 }
 
 function flyTo(spot) {

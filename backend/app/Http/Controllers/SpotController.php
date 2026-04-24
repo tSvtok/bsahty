@@ -19,13 +19,13 @@ class SpotController extends Controller
     public function store(StoreSpotRequest $request)
     {
         $validated = $request->validated();
-        
+
         $spot = new Spot();
         $spot->name = $validated['name'];
         if (isset($validated['status'])) {
             $spot->status = $validated['status'];
         }
-        
+
         // Store coordinates as JSON for now
         if (isset($validated['latitude']) && isset($validated['longitude'])) {
             $spot->coordinates = [
@@ -33,7 +33,7 @@ class SpotController extends Controller
                 'lng' => $validated['longitude']
             ];
         }
-        
+
         $spot->save();
 
         return response()->json(['data' => $spot], 201);
@@ -80,16 +80,5 @@ class SpotController extends Controller
         $spots = $mapService->getNearbySpots($lat, $lng, $radius);
 
         return response()->json(['data' => $spots]);
-    }
-
-    public function geocode(\Illuminate\Http\Request $request, \App\Services\MapService $mapService)
-    {
-        $address = $request->input('address');
-        if (!$address) {
-            return response()->json(['error' => 'Address is required'], 400);
-        }
-
-        $coords = $mapService->geocodeAddress($address);
-        return response()->json(['data' => $coords]);
     }
 }

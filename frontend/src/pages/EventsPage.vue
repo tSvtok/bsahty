@@ -97,7 +97,11 @@ import { useAuthStore } from '@/stores/auth'
 const appStore   = useAppStore()
 const auth       = useAuthStore()
 const showCreate = ref(false)
+const filter     = ref('All')
 const nearbyOnly = ref(false)
+const loadMoreTarget = ref(null)
+
+const sports = ['Football', 'Basketball', 'Tennis', 'Volleyball', 'Running', 'Cycling', 'Padel']
 
 function toggleFilter(s) {
   filter.value = s

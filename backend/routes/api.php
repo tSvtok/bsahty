@@ -32,14 +32,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth & User Profile
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    
+
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/users/{user}', [UserController::class, 'show']);
     Route::put('/me', [UserController::class, 'update']);
 
     // Spots
     Route::get('/spots/nearby', [SpotController::class, 'nearby']);
-    Route::get('/geocode', [SpotController::class, 'geocode']);
     Route::apiResource('spots', SpotController::class);
 
     // Questions

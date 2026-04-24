@@ -220,8 +220,9 @@ const formattedFullDate = computed(() => {
 })
 
 const formattedTime = computed(() => {
-  if (!event.value?.time) return ''
-  return event.value.time.slice(0, 5)
+  if (!event.value?.date) return ''
+  const date = new Date(event.value.date)
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
 })
 
 async function fetchEvent() {

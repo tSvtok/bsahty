@@ -22,32 +22,34 @@
         </div>
 
         <div class="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
-          <!-- Map container -->
-          <div class="relative flex-1 min-h-[300px] lg:min-h-0 z-0">
-            <div ref="mapEl" class="absolute inset-0" />
-            
-            <!-- Mobile Toggle List Button -->
-            <button 
-              @click="showMobileList = !showMobileList"
-              class="lg:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] btn-primary shadow-2xl flex items-center gap-2"
-            >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              {{ showMobileList ? 'Hide List' : 'Show Spots' }}
-            </button>
+          <!-- Map container with dashboard frame -->
+          <div class="relative flex-1 p-4 md:p-6 bg-gray-50/50 flex flex-col min-h-[450px] lg:min-h-0">
+            <div class="flex-1 relative rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white ring-1 ring-black/5 z-0 bg-white">
+              <div ref="mapEl" class="absolute inset-0" />
+              
+              <!-- Mobile Toggle List Button (Inside Frame) -->
+              <button 
+                @click="showMobileList = !showMobileList"
+                class="lg:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] px-6 py-3 bg-orange-500 text-white rounded-full font-bold shadow-xl flex items-center gap-2 active:scale-95 transition-all"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                {{ showMobileList ? 'Hide List' : 'View Nearby Spots' }}
+              </button>
+            </div>
           </div>
 
           <!-- Spots panel -->
           <div 
-            class="w-full lg:w-96 shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-gray-100 bg-white transition-all duration-300 ease-in-out z-10"
+            class="w-full lg:w-96 shrink-0 flex flex-col border-t lg:border-t-0 lg:border-l border-gray-100 bg-white transition-all duration-500 ease-in-out z-10 lg:rounded-none rounded-t-[2.5rem] shadow-2xl lg:shadow-none"
             :class="[
-              showMobileList ? 'h-[50vh] lg:h-full opacity-100' : 'h-0 lg:h-full opacity-0 lg:opacity-100 pointer-events-none lg:pointer-events-auto'
+              showMobileList ? 'h-[60vh] lg:h-full opacity-100 translate-y-0' : 'h-0 lg:h-full opacity-0 lg:opacity-100 translate-y-10 lg:translate-y-0 pointer-events-none lg:pointer-events-auto'
             ]"
           >
             <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20">
               <h2 class="font-bold text-gray-900">Nearby Spots</h2>
-              <span class="badge badge-primary">{{ appStore.spots.length }}</span>
+              <span class="badge badge-primary">{{ displayedSpots.length }}</span>
             </div>
 
             <div class="flex-1 overflow-y-auto">
@@ -63,7 +65,7 @@
 
               <div v-else class="flex flex-col">
                 <div
-                  v-for="spot in appStore.spots" :key="spot.id"
+                  v-for="spot in displayedSpots" :key="spot.id"
                   @click="handleSpotClick(spot)"
                   class="flex items-start gap-3 p-4 hover:bg-orange-50/50 cursor-pointer border-b border-gray-50 transition-colors group"
                 >
@@ -105,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import SuggestSpotModal from '@/modals/SuggestSpotModal.vue'
@@ -117,6 +119,7 @@ const mapEl    = ref(null)
 const showSuggest = ref(false)
 const showMobileList = ref(false)
 const newSpotCoords = ref(null)
+const displayedSpots = computed(() => appStore.spots.slice(0, 10))
 let leafletMap = null
 
 watch(showMobileList, () => {

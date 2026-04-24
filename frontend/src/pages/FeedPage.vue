@@ -61,6 +61,15 @@
 
         <div v-else class="flex flex-col gap-4">
           <PostCard v-for="post in appStore.posts" :key="post.id" :post="post" />
+          
+          <!-- Infinite Scroll Target -->
+          <div ref="loadMoreTarget" class="py-10 flex justify-center">
+            <div v-if="appStore.feedLoading && appStore.posts.length" class="flex gap-2">
+              <SkeletonLoader width="8px" height="8px" class="!rounded-full animate-bounce" />
+              <SkeletonLoader width="8px" height="8px" class="!rounded-full animate-bounce [animation-delay:0.2s]" />
+              <SkeletonLoader width="8px" height="8px" class="!rounded-full animate-bounce [animation-delay:0.4s]" />
+            </div>
+          </div>
         </div>
       </main>
 
@@ -89,13 +98,14 @@ const auth     = useAuthStore()
 const appStore = useAppStore()
 const showCreatePost = ref(false)
 const selectedCategory = ref('All')
+const loadMoreTarget = ref(null)
 
 const categories = ['All', 'FOOTBALL', 'BASKETBALL', 'TENNIS', 'RUNNING', 'CYCLING', 'FITNESS', 'OTHER']
 
 function toggleCategory(cat) {
   selectedCategory.value = cat
   const params = cat === 'All' ? {} : { sport_category: cat }
-  appStore.fetchFeed(params)
+  appStore.fetchFeed({ ...params, page: 1 })
 }
 
 const myAvatar = computed(() =>
@@ -103,10 +113,25 @@ const myAvatar = computed(() =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user?.name || 'A')}&background=f97316&color=fff`
 )
 
+let observer = null
+
 onMounted(() => {
   appStore.fetchFeed()
-  // Refresh feed every 30 seconds to show new comments/posts
-  const interval = setInterval(() => appStore.fetchFeed(), 30000)
-  onUnmounted(() => clearInterval(interval))
+  
+  // Infinite Scroll Observer
+  observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !appStore.feedLoading) {
+      if (appStore.feedPagination.current_page < appStore.feedPagination.last_page) {
+        const params = selectedCategory.value === 'All' ? {} : { sport_category: selectedCategory.value }
+        appStore.fetchFeed({ ...params, page: appStore.feedPagination.current_page + 1 }, true)
+      }
+    }
+  }, { threshold: 0.1 })
+
+  if (loadMoreTarget.value) observer.observe(loadMoreTarget.value)
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
 })
 </script>

@@ -81,4 +81,15 @@ class SpotController extends Controller
 
         return response()->json(['data' => $spots]);
     }
+
+    public function geocode(\Illuminate\Http\Request $request, \App\Services\MapService $mapService)
+    {
+        $address = $request->input('address');
+        if (!$address) {
+            return response()->json(['error' => 'Address is required'], 400);
+        }
+
+        $coords = $mapService->geocodeAddress($address);
+        return response()->json(['data' => $coords]);
+    }
 }

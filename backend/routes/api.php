@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Spots
     Route::get('/spots/nearby', [SpotController::class, 'nearby']);
+    Route::get('/geocode', [SpotController::class, 'geocode']);
     Route::apiResource('spots', SpotController::class);
 
     // Questions

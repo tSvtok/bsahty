@@ -4,7 +4,7 @@
       class="max-w-[85%] sm:max-w-[70%] px-4 py-2.5 rounded-2xl text-sm shadow-sm"
       :class="isMe ? 'bg-orange-500 text-white rounded-br-none' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'"
     >
-      {{ message.body }}
+      {{ message.content || message.body }}
     </div>
     <div class="flex items-center gap-1 mt-1 px-1">
       <span class="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">{{ formatTime(message.created_at) }}</span>

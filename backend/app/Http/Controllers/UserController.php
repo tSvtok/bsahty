@@ -7,6 +7,21 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = User::query();
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('sports', 'like', "%{$search}%");
+        }
+
+        $users = $query->where('id', '!=', auth()->id())->paginate(20);
+
+        return response()->json($users);
+    }
+
     public function show(User $user)
     {
         $user->load(['questions', 'friendships']);

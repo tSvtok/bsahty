@@ -118,7 +118,7 @@ async function fetchData() {
   loading.value = true
   try {
     const [uRes, fRes] = await Promise.all([
-      api.get('/admin/users'), // Reusing admin users for now or use a proper public list
+      api.get('/users'),
       api.get('/friendships')
     ])
     users.value = uRes.data.data

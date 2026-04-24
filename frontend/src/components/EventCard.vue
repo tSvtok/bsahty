@@ -4,9 +4,22 @@
     @click="router.push(`/events/${event.id}`)"
   >
     <!-- Cover Image -->
-    <div class="h-32 sm:h-40 relative overflow-hidden bg-gray-100">
+    <div class="h-40 sm:h-48 relative overflow-hidden bg-gray-100">
       <img v-if="displayImage" :src="displayImage" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-      <div v-else class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200" />
+      
+      <!-- Gradient Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+
+      <!-- Badges on top of image -->
+      <div class="absolute bottom-3 left-3 flex gap-2">
+        <span class="glass px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-white border-white/20">
+          {{ event.sport }}
+        </span>
+        <span v-if="event.level" class="bg-orange-500/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider text-white shadow-lg">
+          {{ event.level }}
+        </span>
+      </div>
+
       <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
     </div>
 
@@ -14,10 +27,6 @@
     <!-- Header row -->
     <div class="flex items-start justify-between gap-3">
       <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="badge badge-primary text-xs">{{ event.sport }}</span>
-          <span v-if="event.level" class="badge badge-info text-xs">{{ event.level }}</span>
-        </div>
         <h3 class="font-bold text-base leading-snug group-hover:text-orange-500 transition-colors truncate">{{ event.title }}</h3>
       </div>
       <div class="text-right shrink-0">

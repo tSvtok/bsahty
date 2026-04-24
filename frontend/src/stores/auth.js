@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { authApi } from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -10,13 +10,29 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isLoggedIn = computed(() => !!token.value)
 
+  const isReady = ref(false)
+
   async function fetchMe() {
     try {
       const res = await authApi.me()
       user.value = res.data.data
     } catch {
       user.value = null
+    } finally {
+      isReady.value = true
     }
+  }
+
+  function waitForInit() {
+    return new Promise((resolve) => {
+      if (isReady.value) return resolve()
+      const unwatch = watch(isReady, (val) => {
+        if (val) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
   }
 
   async function login(credentials) {
@@ -69,7 +85,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // On app boot, hydrate user if token exists
-  if (token.value) fetchMe()
+  if (token.value) {
+    fetchMe()
+  } else {
+    isReady.value = true
+  }
 
-  return { token, user, loading, error, isLoggedIn, login, register, logout, fetchMe }
+  return { token, user, loading, error, isLoggedIn, isReady, login, register, logout, fetchMe, waitForInit }
 })

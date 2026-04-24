@@ -105,20 +105,21 @@ watch(() => route.query.q, (newQ) => {
   searchQuery.value = newQ || ''
 })
 
-const filteredUsers = computed(() => {
-  return users.value.filter(u => {
-    if (u.id === auth.user?.id) return false
-    const match = u.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
-                  (u.sports && u.sports.some(s => s.toLowerCase().includes(searchQuery.value.toLowerCase())))
-    return match
-  })
+let debounceTimer = null
+watch(searchQuery, () => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    fetchData()
+  }, 300)
 })
+
+const filteredUsers = computed(() => users.value)
 
 async function fetchData() {
   loading.value = true
   try {
     const [uRes, fRes] = await Promise.all([
-      api.get('/users'),
+      api.get('/users', { params: { search: searchQuery.value } }),
       api.get('/friendships')
     ])
     users.value = uRes.data.data

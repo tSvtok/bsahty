@@ -51,9 +51,9 @@
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="f in friends" :key="f.id" class="card p-4 flex items-center gap-3 group hover:border-orange-200 transition-colors">
-              <img :src="getFriend(f).avatar || defaultAvatar(getFriend(f).name)" class="w-12 h-12 rounded-full object-cover shrink-0" />
+              <img :src="getFriend(f).avatar_url || defaultAvatar(getFriend(f).name)" class="w-12 h-12 rounded-full object-cover shrink-0" />
               <div class="flex-1 min-w-0">
-                <router-link :to="'/users/' + getFriend(f).id" class="font-bold text-gray-900 hover:text-orange-500 truncate block">
+                <router-link :to="'/profile/' + getFriend(f).id" class="font-bold text-gray-900 hover:text-orange-500 truncate block">
                   {{ getFriend(f).name }}
                 </router-link>
                 <p class="text-xs text-gray-500 truncate">{{ getFriend(f).location || 'Athlete' }}</p>
@@ -80,9 +80,9 @@
 
           <div v-else class="flex flex-col gap-4">
             <div v-for="req in pendingRequests" :key="req.id" class="card p-4 flex items-center gap-4">
-              <img :src="req.user.avatar || defaultAvatar(req.user.name)" class="w-12 h-12 rounded-full object-cover" />
+              <img :src="req.user.avatar_url || defaultAvatar(req.user.name)" class="w-12 h-12 rounded-full object-cover" />
               <div class="flex-1 min-w-0">
-                <router-link :to="'/users/' + req.user.id" class="font-bold text-gray-900 hover:text-orange-500">
+                <router-link :to="'/profile/' + req.user.id" class="font-bold text-gray-900 hover:text-orange-500">
                   {{ req.user.name }}
                 </router-link>
                 <p class="text-xs text-gray-500 truncate">Wants to be your friend</p>

@@ -26,6 +26,9 @@ class EventController extends Controller
         $validated['organizer_id'] = $request->user()->id;
         
         $event = Event::create($validated);
+        $event->load('organizer');
+
+        broadcast(new \App\Events\EventCreated($event))->toOthers();
 
         if ($request->filled('question_id')) {
             $question = \App\Models\Question::find($request->question_id);
@@ -39,7 +42,7 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('questions.user');
+        $event->load(['questions.user', 'participants', 'organizer']);
         return response()->json(['data' => $event]);
     }
 

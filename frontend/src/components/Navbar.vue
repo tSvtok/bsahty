@@ -141,17 +141,19 @@
 <script setup>
 import { ref, computed, h, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useMessagingStore } from '@/stores/messaging'
 import { useRouter } from 'vue-router'
 import echo from '@/services/echo'
 import api from '@/services/api'
 
 const auth = useAuthStore()
+const messagingStore = useMessagingStore()
 const router = useRouter()
 const search = ref('')
 const showMobileMenu = ref(false)
 const showNotifications = ref(false)
 const notifications = ref([])
-const unreadMessagesCount = ref(0)
+const unreadMessagesCount = computed(() => messagingStore.unreadCount)
 const isScrolled = ref(false)
 
 function addNotification(n) {
@@ -197,7 +199,7 @@ function setupEcho() {
       })
     })
     .listen('.message.new', (e) => {
-      unreadMessagesCount.value++
+      messagingStore.incrementUnread()
       addNotification({
         title: 'New Message',
         body: `You received a new message.`,
@@ -239,10 +241,7 @@ async function fetchNotifications() {
 
 async function fetchUnreadCount() {
   if (!auth.isLoggedIn) return
-  try {
-    const res = await api.get('/messages/unread-count')
-    unreadMessagesCount.value = res.data.count
-  } catch (err) { console.error(err) }
+  await messagingStore.fetchUnreadCount()
 }
 
 async function markAllRead() {

@@ -78,11 +78,13 @@ import { useRoute } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 import { messagingApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { useMessagingStore } from '@/stores/messaging'
 import echo from '@/services/echo'
 
 const route       = useRoute()
-const auth        = useAuthStore()
-const messages    = ref([])
+const auth           = useAuthStore()
+const messagingStore = useMessagingStore()
+const messages       = ref([])
 const newMessage  = ref('')
 const loading     = ref(true)
 const sending     = ref(false)
@@ -151,14 +153,16 @@ onMounted(async () => {
         messages.value.push(e.message)
         scrollToBottom()
         // Mark as read immediately
-        api.patch(`/messages/${e.message.id}/read`)
+        messagingApi.markRead(e.message.id)
+        messagingStore.decrementUnread()
       }
     })
 
   // Mark all currently unread messages as read
   messages.value.forEach(m => {
     if (m.user_id !== auth.user?.id && !m.is_read) {
-      api.patch(`/messages/${m.id}/read`)
+      messagingApi.markRead(m.id)
+      messagingStore.decrementUnread()
     }
   })
 })

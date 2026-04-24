@@ -71,6 +71,7 @@ export const messagingApi = {
   conversation:     (id)      => api.get(`/conversations/${id}`),
   send:             (data)    => api.post('/messages', data),
   markRead:         (id)      => api.patch(`/messages/${id}/read`),
+  unreadCount:      ()        => api.get('/messages/unread-count'),
 }
 
 // ─── Admin ──────────────────────────────────────────────────────────────────

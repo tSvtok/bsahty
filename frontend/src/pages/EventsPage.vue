@@ -21,7 +21,7 @@
         <div class="flex flex-wrap gap-2 mb-6">
           <button
             v-for="s in ['All', ...sports]" :key="s"
-            @click="filter = s"
+            @click="toggleFilter(s)"
             class="px-4 py-1.5 rounded-full text-sm font-medium border transition-all"
             :class="filter === s ? 'bg-orange-500 text-white border-orange-500 shadow' : 'border-gray-200 text-gray-600 hover:border-orange-300 bg-white'"
           >{{ s }}</button>
@@ -43,14 +43,23 @@
           </div>
         </div>
 
-        <div v-else-if="!filteredEvents.length" class="card p-12 text-center text-gray-400">
+        <div v-else-if="!appStore.events.length" class="card p-12 text-center text-gray-400">
           <div class="text-5xl mb-3">🏟</div>
           <h3 class="font-semibold text-gray-700 mb-1">No events found</h3>
           <p class="text-sm">Try a different sport or organize your own match!</p>
         </div>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <EventCard v-for="event in filteredEvents" :key="event.id" :event="event" />
+          <EventCard v-for="event in appStore.events" :key="event.id" :event="event" />
+        </div>
+
+        <!-- Infinite Scroll Target -->
+        <div ref="loadMoreTarget" class="py-10 flex justify-center">
+          <div v-if="appStore.eventsLoading && appStore.events.length" class="flex gap-2">
+            <div class="w-2 h-2 rounded-full bg-orange-400 animate-bounce" />
+            <div class="w-2 h-2 rounded-full bg-orange-400 animate-bounce [animation-delay:0.2s]" />
+            <div class="w-2 h-2 rounded-full bg-orange-400 animate-bounce [animation-delay:0.4s]" />
+          </div>
         </div>
       </main>
 
@@ -65,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import EventCard from '@/components/EventCard.vue'
@@ -76,14 +85,35 @@ import { useAppStore } from '@/stores/app'
 const appStore   = useAppStore()
 const showCreate = ref(false)
 const filter     = ref('All')
+const loadMoreTarget = ref(null)
 
 const sports = ['Football', 'Basketball', 'Tennis', 'Volleyball', 'Running', 'Cycling', 'Padel']
 
-const filteredEvents = computed(() =>
-  filter.value === 'All'
-    ? appStore.events
-    : appStore.events.filter(e => e.sport === filter.value)
-)
+function toggleFilter(s) {
+  filter.value = s
+  const params = s === 'All' ? {} : { sport: s }
+  appStore.fetchEvents({ ...params, page: 1 })
+}
 
-onMounted(() => appStore.fetchEvents())
+let observer = null
+
+onMounted(() => {
+  appStore.fetchEvents()
+
+  // Infinite Scroll Observer
+  observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !appStore.eventsLoading) {
+      if (appStore.eventsPagination.current_page < appStore.eventsPagination.last_page) {
+        const params = filter.value === 'All' ? {} : { sport: filter.value }
+        appStore.fetchEvents({ ...params, page: appStore.eventsPagination.current_page + 1 }, true)
+      }
+    }
+  }, { threshold: 0.1 })
+
+  if (loadMoreTarget.value) observer.observe(loadMoreTarget.value)
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
+})
 </script>

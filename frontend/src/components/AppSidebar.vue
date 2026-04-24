@@ -53,7 +53,7 @@ const auth   = useAuthStore()
 const router = useRouter()
 
 const avatar = computed(() =>
-  auth.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user?.name || 'A')}&background=f97316&color=fff`
+  auth.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user?.name || 'A')}&background=f97316&color=fff`
 )
 
 async function handleLogout() {

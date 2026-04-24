@@ -148,9 +148,9 @@ function getDistance(spotLat, spotLng) {
 }
 
 const spotEmoji = (type) => ({
-  gym: '🏋️', court: '🏀', stadium: '🏟️', pool: '🏊',
-  park: '🌳', track: '🏃', fitness: '💪', default: '📍'
-}[type?.toLowerCase()] || '📍')
+  gym: '', court: '', stadium: '', pool: '',
+  park: '', track: '', fitness: '', default: ''
+}[type?.toLowerCase()] || '')
 
 onMounted(async () => {
   await appStore.fetchSpots()

@@ -81,52 +81,14 @@
       </div>
 
       <!-- Messages -->
-      <div class="relative">
-        <button v-if="auth.isLoggedIn" @click="showMessages = !showMessages" class="relative w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
-          <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-          <span v-if="unreadMessagesCount > 0" class="absolute top-1 right-1 min-w-[1.25rem] h-5 px-1 bg-orange-600 text-white text-[10px] font-black rounded-full ring-2 ring-white flex items-center justify-center">
-            {{ unreadMessagesCount > 9 ? '9+' : unreadMessagesCount }}
-          </span>
-        </button>
-
-        <!-- Messages Dropdown -->
-        <transition name="mobile-menu">
-          <div v-if="showMessages" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
-            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 class="font-bold text-sm">Messages</h3>
-              <router-link to="/messages" @click="showMessages = false" class="text-xs text-orange-500 font-medium hover:underline">View all</router-link>
-            </div>
-            <div class="max-h-96 overflow-y-auto">
-              <div v-if="conversations.length === 0" class="p-8 text-center text-gray-400">
-                <p class="text-xs">No conversations yet</p>
-              </div>
-              <router-link
-                v-for="c in conversations" :key="c.id"
-                :to="`/messages/${c.id}`"
-                @click="showMessages = false"
-                class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors flex gap-3 items-center"
-              >
-                <div class="relative">
-                  <img :src="getAvatar(c.other_user)" class="w-10 h-10 rounded-full object-cover shrink-0" />
-                  <span v-if="c.unread_count" class="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border-2 border-white"></span>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex justify-between items-baseline">
-                    <p class="text-sm font-bold text-gray-900 truncate">{{ c.other_user?.name }}</p>
-                    <span class="text-[10px] text-gray-400">{{ formatTime(c.last_message?.created_at) }}</span>
-                  </div>
-                  <p class="text-xs text-gray-500 truncate" :class="{ 'font-bold text-gray-900': c.unread_count }">
-                    {{ c.last_message?.content || 'No messages yet' }}
-                  </p>
-                </div>
-              </router-link>
-            </div>
-          </div>
-        </transition>
-      </div>
-
+      <router-link v-if="auth.isLoggedIn" to="/messages" class="relative w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+        <svg class="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+        <span v-if="unreadMessagesCount > 0" class="absolute top-1 right-1 min-w-[1.25rem] h-5 px-1 bg-orange-600 text-white text-[10px] font-black rounded-full ring-2 ring-white flex items-center justify-center">
+          {{ unreadMessagesCount > 9 ? '9+' : unreadMessagesCount }}
+        </span>
+      </router-link>
 
       <!-- Avatar / Auth buttons -->
       <template v-if="auth.isLoggedIn">
@@ -188,12 +150,9 @@ const router = useRouter()
 const search = ref('')
 const showMobileMenu = ref(false)
 const showNotifications = ref(false)
-const showMessages = ref(false)
 const notifications = ref([])
-const conversations = ref([])
 const unreadMessagesCount = ref(0)
 const isScrolled = ref(false)
-
 
 function addNotification(n) {
   notifications.value.unshift({
@@ -211,17 +170,6 @@ function handleSearch() {
 const avatar = computed(() =>
   auth.user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user?.name || 'A')}&background=f97316&color=fff`
 )
-
-function getAvatar(user) {
-  return user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'A')}&background=f97316&color=fff&size=80`
-}
-
-function formatTime(ts) {
-  if (!ts) return ''
-  const d = new Date(ts), diff = (Date.now() - d) / 1000
-  if (diff < 86400) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  return d.toLocaleDateString()
-}
 
 const handleLogout = async () => {
   try {
@@ -250,12 +198,11 @@ function setupEcho() {
     })
     .listen('.message.new', (e) => {
       unreadMessagesCount.value++
-      fetchConversations() // Update dropdown list
-    })
-    .listen('.message.read', (e) => {
-      if (unreadMessagesCount.value > 0) {
-        unreadMessagesCount.value--
-      }
+      addNotification({
+        title: 'New Message',
+        body: `You received a new message.`,
+        icon: ''
+      })
     })
 
   // Public events
@@ -270,17 +217,8 @@ function setupEcho() {
 }
 
 watch(() => auth.user?.id, (newId) => {
-  if (newId) {
-    setupEcho()
-    fetchNotifications()
-    fetchUnreadCount()
-    fetchConversations()
-  }
+  if (newId) setupEcho()
   else echo.leave(`user.${auth.user?.id}`)
-})
-
-watch(showMessages, (val) => {
-  if (val) fetchConversations()
 })
 
 async function fetchNotifications() {
@@ -292,7 +230,7 @@ async function fetchNotifications() {
       id: n.id,
       title: n.data.title || 'Notification',
       body: n.data.message || n.data.body || n.data.message || '',
-      icon: n.data.icon || '🔔',
+      icon: n.data.icon || '',
       time: new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       read: !!n.read_at
     }))
@@ -307,14 +245,6 @@ async function fetchUnreadCount() {
   } catch (err) { console.error(err) }
 }
 
-async function fetchConversations() {
-  if (!auth.isLoggedIn) return
-  try {
-    const res = await api.get('/conversations')
-    conversations.value = res.data.data || []
-  } catch (err) { console.error(err) }
-}
-
 async function markAllRead() {
   try {
     await api.post('/notifications/read-all')
@@ -326,7 +256,6 @@ onMounted(() => {
   setupEcho()
   fetchNotifications()
   fetchUnreadCount()
-  fetchConversations()
   window.addEventListener('scroll', handleScroll)
 })
 
@@ -345,6 +274,7 @@ const navLinks = [
   { to: '/feed', label: 'Feed', icon: HomeIcon },
   { to: '/map', label: 'Map', icon: MapIcon },
   { to: '/events', label: 'Events', icon: CalendarIcon },
+  { to: '/messages', label: 'Messages', icon: ChatIcon },
 ]
 </script>
 

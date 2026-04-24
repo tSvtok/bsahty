@@ -91,8 +91,8 @@ const isFull      = computed(() => spotsLeft.value <= 0)
 const progressPct = computed(() => Math.min(100, (participantCount.value / maxParticipants.value) * 100))
 
 const sportEmojiMap = {
-  football: '⚽', basketball: '🏀', tennis: '🎾', volleyball: '🏐',
-  swimming: '🏊', running: '🏃', cycling: '🚲', padel: '🎾', default: '🏆'
+  football: '', basketball: '', tennis: '', volleyball: '',
+  swimming: '', running: '', cycling: '', padel: '', default: ''
 }
 const sportEmoji = computed(() => sportEmojiMap[props.event.sport?.toLowerCase()] || sportEmojiMap.default)
 

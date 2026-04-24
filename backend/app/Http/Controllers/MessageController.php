@@ -11,7 +11,7 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request)
     {
         $validated = $request->validated();
-        
+
         $conversation = Conversation::findOrFail($validated['conversation_id']);
 
         if (!$conversation->users()->where('user_id', $request->user()->id)->exists()) {
@@ -29,22 +29,19 @@ class MessageController extends Controller
     public function markAsRead(Message $message)
     {
         $message->update(['is_read' => true]);
-        
-        broadcast(new \App\Events\MessageRead($message, auth()->id()));
-
         return response()->json(['data' => $message]);
     }
 
     public function unreadCount(\Illuminate\Http\Request $request)
     {
-        $count = Message::whereHas('conversation', function($query) use ($request) {
-            $query->whereHas('users', function($q) use ($request) {
+        $count = Message::whereHas('conversation', function ($query) use ($request) {
+            $query->whereHas('users', function ($q) use ($request) {
                 $q->where('users.id', $request->user()->id);
             });
         })
-        ->where('user_id', '!=', $request->user()->id)
-        ->where('is_read', false)
-        ->count();
+            ->where('user_id', '!=', $request->user()->id)
+            ->where('is_read', false)
+            ->count();
 
         return response()->json(['count' => $count]);
     }

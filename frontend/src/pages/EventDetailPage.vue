@@ -196,8 +196,8 @@ const error   = ref(null)
 const event   = ref(null)
 
 const sportEmojiMap = {
-  football: '⚽', basketball: '🏀', tennis: '🎾', volleyball: '🏐',
-  swimming: '🏊', running: '🏃', cycling: '🚲', padel: '🎾', default: '🏆'
+  football: '', basketball: '', tennis: '', volleyball: '',
+  swimming: '', running: '', cycling: '', padel: '', default: ''
 }
 
 const sportEmoji = computed(() => sportEmojiMap[event.value?.sport?.toLowerCase()] || sportEmojiMap.default)

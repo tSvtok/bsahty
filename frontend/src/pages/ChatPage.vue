@@ -76,7 +76,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
-import api, { messagingApi } from '@/services/api'
+import { messagingApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import echo from '@/services/echo'
 

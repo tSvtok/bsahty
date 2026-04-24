@@ -221,7 +221,6 @@ async function startConversation() {
   }
 }
 
-
 onMounted(() => { 
   appStore.fetchFeed()
   appStore.fetchEvents()

@@ -39,10 +39,10 @@
 <script setup>
 // Mock trending data — replace with API call in production
 const trending = [
-  { name: 'Football',    emoji: '⚽', events: 24, popularity: 92 },
-  { name: 'Basketball',  emoji: '🏀', events: 18, popularity: 74 },
-  { name: 'Tennis',      emoji: '🎾', events: 15, popularity: 60 },
-  { name: 'Volleyball',  emoji: '🏐', events: 11, popularity: 45 },
-  { name: 'Running',     emoji: '🏃', events: 8,  popularity: 32 },
+  { name: 'Football',    emoji: '', events: 24, popularity: 92 },
+  { name: 'Basketball',  emoji: '', events: 18, popularity: 74 },
+  { name: 'Tennis',      emoji: '', events: 15, popularity: 60 },
+  { name: 'Volleyball',  emoji: '', events: 11, popularity: 45 },
+  { name: 'Running',     emoji: '', events: 8,  popularity: 32 },
 ]
 </script>

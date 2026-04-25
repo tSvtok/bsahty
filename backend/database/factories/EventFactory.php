@@ -20,6 +20,8 @@ class EventFactory extends Factory
             'date' => fake()->dateTimeBetween('now', '+1 month'),
             'max_participants' => fake()->numberBetween(5, 20),
             'status' => 'OPEN',
+            'latitude' => fake()->latitude(36.7, 36.8),
+            'longitude' => fake()->longitude(3.0, 3.1),
             'organizer_id' => User::factory(),
             'spot_id' => Spot::factory(),
         ];

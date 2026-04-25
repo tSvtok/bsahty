@@ -15,7 +15,7 @@ class FileController extends Controller
     {
         $request->validate([
             'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20480', // 5MB max
-            'type' => 'required|string|in:avatar,post,event',
+            'type' => 'required|string|in:avatar,post,event,spot',
         ]);
 
         if (!$request->hasFile('file')) {

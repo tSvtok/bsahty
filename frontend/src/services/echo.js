@@ -13,10 +13,12 @@ const echo = new Echo({
   enabledTransports: ['ws', 'wss'],
   authEndpoint: '/api/broadcasting/auth',
   auth: {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('bssahty_token')}`,
-      Accept: 'application/json',
-    },
+    get headers() {
+      return {
+        Authorization: `Bearer ${localStorage.getItem('bssahty_token')}`,
+        Accept: 'application/json',
+      }
+    }
   },
 })
 

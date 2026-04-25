@@ -1,0 +1,441 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .wrap { padding: 1.5rem 0; }
+  .section { margin-bottom: 2rem; }
+  .section-title {
+    font-size: 11px; font-weight: 500; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--color-text-tertiary);
+    margin-bottom: .75rem; padding-bottom: .4rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: .75rem;
+  }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; }
+  .card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 2px 8px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .badge-ok  { background: var(--color-background-success); color: var(--color-text-success); }
+  .badge-warn{ background: var(--color-background-warning); color: var(--color-text-warning); }
+  .badge-err { background: var(--color-background-danger);  color: var(--color-text-danger);  }
+  .badge-info{ background: var(--color-background-info);    color: var(--color-text-info);    }
+  .badge-neu { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+  .desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: .6rem; }
+  .tag {
+    font-size: 11px; padding: 2px 8px; border-radius: 4px;
+    border: 0.5px solid var(--color-border-tertiary);
+    color: var(--color-text-secondary);
+    background: var(--color-background-secondary);
+  }
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .progress-label { font-size: 13px; color: var(--color-text-secondary); width: 120px; flex-shrink: 0; }
+  .progress-bar-bg {
+    flex: 1; height: 6px; background: var(--color-background-secondary);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+  .progress-pct { font-size: 12px; color: var(--color-text-tertiary); width: 36px; text-align: right; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .metric-card {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: .9rem 1rem;
+    text-align: center;
+  }
+  .metric-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .metric-lbl { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+  .issue-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: .55rem 0;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .issue-row:last-child { border-bottom: none; }
+  .issue-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+  .issue-sub  { font-size: 12px; color: var(--color-text-tertiary); margin-top: 1px; }
+  .stack-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack-chip {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; padding: 4px 10px;
+    border-radius: 6px; border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    color: var(--color-text-secondary);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-php   { background: #7c7ff5; }
+  .dot-vue   { background: #41b883; }
+  .dot-js    { background: #f0db4f; border: 0.5px solid #ccc; }
+  .dot-blade { background: #f55247; }
+  .dot-css   { background: #264de4; }
+  .dot-html  { background: #e44d26; }
+  .dot-pg    { background: #336791; }
+  .dot-dock  { background: #0db7ed; }
+  .dot-nginx { background: #009900; }
+  .dot-gray  { background: var(--color-text-tertiary); }
+  .lang-bar  { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin: .75rem 0 .5rem; }
+  .lang-seg  { height: 100%; transition: width .5s; }
+  .lang-legend { display: flex; flex-wrap: wrap; gap: 10px; }
+  .lang-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text-secondary); }
+  .road-item {
+    display: flex; gap: 12px; padding: .5rem 0;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .road-item:last-child { border-bottom: none; }
+  .road-phase { font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 4px; white-space: nowrap; height: fit-content; margin-top: 1px; }
+  .road-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+  .road-sub  { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+  .arch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .arch-box {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: .75rem 1rem;
+  }
+  .arch-box-title { font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: .4rem; }
+  .arch-item { font-size: 12px; color: var(--color-text-secondary); line-height: 1.7; }
+  .overview-score {
+    display: flex; align-items: center; gap: 1.5rem;
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+  }
+  .big-score { font-size: 48px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+  .score-label { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+  .score-ring {
+    width: 72px; height: 72px; flex-shrink: 0;
+  }
+</style>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--color-text-primary);">B-SSAHTY</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">Analyse complète du dépôt · github.com/tSvtok/bsahty</div>
+    </div>
+    <span class="badge badge-warn">72% complété</span>
+  </div>
+
+  <!-- Overview score + metrics -->
+  <div class="section">
+    <div class="section-title">Vue d'ensemble</div>
+    <div class="grid3" style="margin-bottom:10px;">
+      <div class="metric-card"><div class="metric-val">120</div><div class="metric-lbl">Commits</div></div>
+      <div class="metric-card"><div class="metric-val">40+</div><div class="metric-lbl">Endpoints API</div></div>
+      <div class="metric-card"><div class="metric-val">15k+</div><div class="metric-lbl">Lignes de code</div></div>
+    </div>
+    <div class="grid3">
+      <div class="metric-card"><div class="metric-val">9</div><div class="metric-lbl">Tables BDD</div></div>
+      <div class="metric-card"><div class="metric-val">16</div><div class="metric-lbl">Migrations</div></div>
+      <div class="metric-card"><div class="metric-val">15+</div><div class="metric-lbl">Composants Vue</div></div>
+    </div>
+  </div>
+
+  <!-- Language bar -->
+  <div class="section">
+    <div class="section-title">Langages (répartition du code)</div>
+    <div class="card">
+      <div class="lang-bar">
+        <div class="lang-seg" style="width:48.3%;background:#f0db4f;"></div>
+        <div class="lang-seg" style="width:19.3%;background:#41b883;"></div>
+        <div class="lang-seg" style="width:16.8%;background:#7c7ff5;"></div>
+        <div class="lang-seg" style="width:10%;background:#f55247;"></div>
+        <div class="lang-seg" style="width:4.2%;background:#e44d26;"></div>
+        <div class="lang-seg" style="width:1.1%;background:#264de4;"></div>
+        <div class="lang-seg" style="flex:1;background:var(--color-border-tertiary);"></div>
+      </div>
+      <div class="lang-legend">
+        <div class="lang-item"><span class="dot dot-js"></span>JavaScript 48.3%</div>
+        <div class="lang-item"><span class="dot dot-vue"></span>Vue 19.3%</div>
+        <div class="lang-item"><span class="dot dot-php"></span>PHP 16.8%</div>
+        <div class="lang-item"><span class="dot dot-blade"></span>Blade 10%</div>
+        <div class="lang-item"><span class="dot dot-html"></span>HTML 4.2%</div>
+        <div class="lang-item"><span class="dot dot-css"></span>CSS 1.1%</div>
+        <div class="lang-item"><span class="dot dot-gray"></span>Autre 0.3%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stack technique -->
+  <div class="section">
+    <div class="section-title">Stack technique</div>
+    <div class="arch-grid">
+      <div class="arch-box">
+        <div class="arch-box-title">Backend</div>
+        <div class="arch-item">Laravel 13 · PHP 8.4</div>
+        <div class="arch-item">PostgreSQL 16 + PostGIS</div>
+        <div class="arch-item">Laravel Sanctum (auth tokens)</div>
+        <div class="arch-item">Laravel Reverb (WebSockets)</div>
+        <div class="arch-item">API REST · 12 contrôleurs</div>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Frontend</div>
+        <div class="arch-item">Vue 3 (Composition API)</div>
+        <div class="arch-item">Vite · Vue Router</div>
+        <div class="arch-item">Pinia (state management)</div>
+        <div class="arch-item">Tailwind CSS 4</div>
+        <div class="arch-item">Leaflet.js (carte interactive)</div>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Infrastructure</div>
+        <div class="arch-item">Docker + Docker Compose</div>
+        <div class="arch-item">Nginx (reverse proxy)</div>
+        <div class="arch-item">5 conteneurs : app, db, web, frontend, reverb</div>
+        <div class="arch-item">Node 20-alpine (frontend build)</div>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Structure du repo</div>
+        <div class="arch-item">/backend → API Laravel</div>
+        <div class="arch-item">/frontend → SPA Vue 3</div>
+        <div class="arch-item">/docker → Nginx + PHP Dockerfile</div>
+        <div class="arch-item">/uml · /scratch · docs .md</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completion progress -->
+  <div class="section">
+    <div class="section-title">Avancement par couche</div>
+    <div class="card">
+      <div class="progress-row">
+        <div class="progress-label">Infrastructure</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:85%;background:#41b883;"></div></div>
+        <div class="progress-pct">85%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Backend (API)</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:80%;background:#7c7ff5;"></div></div>
+        <div class="progress-pct">80%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Base de données</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:95%;background:#41b883;"></div></div>
+        <div class="progress-pct">95%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Frontend (UI)</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:76%;background:#7c7ff5;"></div></div>
+        <div class="progress-pct">76%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">UI / Design system</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:72%;background:#f0db4f;"></div></div>
+        <div class="progress-pct">72%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Auth & sécurité</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:90%;background:#41b883;"></div></div>
+        <div class="progress-pct">90%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">State management</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:90%;background:#41b883;"></div></div>
+        <div class="progress-pct">90%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Real-time (WS)</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:20%;background:#f0db4f;"></div></div>
+        <div class="progress-pct">20%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Tests</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:20%;background:#f55247;"></div></div>
+        <div class="progress-pct">20%</div>
+      </div>
+      <div class="progress-row" style="margin-bottom:0;">
+        <div class="progress-label">Upload fichiers</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%;background:#f55247;"></div></div>
+        <div class="progress-pct">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixes appliqués -->
+  <div class="section">
+    <div class="section-title">Corrections appliquées (17 fixes)</div>
+    <div class="card">
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Backend</span>
+        <div><div class="issue-text">Configuration CORS</div><div class="issue-sub">HandleCors middleware ajouté · config/cors.php créé</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Backend</span>
+        <div><div class="issue-text">Validation des requêtes</div><div class="issue-sub">UpdateQuestionRequest + UpdateEventRequest créés</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Backend</span>
+        <div><div class="issue-text">Autorisation & sécurité</div><div class="issue-sub">Remplacement Gate par checks explicites · erreurs 403 propres</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Backend</span>
+        <div><div class="issue-text">Format de réponse standardisé</div><div class="issue-sub">Endpoint /me wrappé dans ['data' => ...]</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Backend</span>
+        <div><div class="issue-text">Pagination</div><div class="issue-sub">15 items/page sur questions et events</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Backend</span>
+        <div><div class="issue-text">Coordonnées spots (PostGIS → JSON)</div><div class="issue-sub">Migration + accesseurs lat/lng + appends</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Frontend</span>
+        <div><div class="issue-text">User store nettoyé</div><div class="issue-sub">Plus de "Alex Rivers" hardcodé · clearUser() ajouté</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Frontend</span>
+        <div><div class="issue-text">Guards de navigation</div><div class="issue-sub">beforeEach guard · auto-load depuis /me · redirect login</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Frontend</span>
+        <div><div class="issue-text">Gestion des erreurs API</div><div class="issue-sub">Intercepteur Axios · auto-logout sur 401</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-ok" style="margin-top:1px;">✓ Frontend</span>
+        <div><div class="issue-text">Menu mobile (hamburger)</div><div class="issue-sub">Drawer animé + bouton hamburger dans Navbar.vue</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issues restants -->
+  <div class="section">
+    <div class="section-title">Problèmes restants</div>
+    <div class="card">
+      <div class="issue-row">
+        <span class="badge badge-err" style="margin-top:1px;">Critique</span>
+        <div><div class="issue-text">Zéro tests écrits</div><div class="issue-sub">PHPUnit installé mais aucun test unitaire ni feature test</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-err" style="margin-top:1px;">Critique</span>
+        <div><div class="issue-text">Upload de fichiers manquant</div><div class="issue-sub">Pas d'endpoint image ni d'UI upload (avatar, posts, spots)</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-err" style="margin-top:1px;">Critique</span>
+        <div><div class="issue-text">Real-time non fonctionnel</div><div class="issue-sub">WebSockets configurés mais non testés · pas de messages live</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-warn" style="margin-top:1px;">Moyen</span>
+        <div><div class="issue-text">Responsive mobile incomplet</div><div class="issue-sub">MapPage, ProfilePage et modals pas optimisés mobile/tablette</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-warn" style="margin-top:1px;">Moyen</span>
+        <div><div class="issue-text">Accessibilité partielle</div><div class="issue-sub">Focus states manquants · ARIA labels absents · 55% WCAG</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-warn" style="margin-top:1px;">Moyen</span>
+        <div><div class="issue-text">Pas de données de test réalistes</div><div class="issue-sub">Seeder minimal · manque 50+ users, events, posts géolocalisés</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-neu" style="margin-top:1px;">Faible</span>
+        <div><div class="issue-text">Pas de panel admin</div><div class="issue-sub">Contrôleur présent, aucune interface UI</div></div>
+      </div>
+      <div class="issue-row">
+        <span class="badge badge-neu" style="margin-top:1px;">Faible</span>
+        <div><div class="issue-text">Dark mode absent</div><div class="issue-sub">Aucun thème sombre implémenté</div></div>
+      </div>
+      <div class="issue-row" style="border-bottom:none;">
+        <span class="badge badge-neu" style="margin-top:1px;">Faible</span>
+        <div><div class="issue-text">Pas de documentation API</div><div class="issue-sub">Aucun Swagger/OpenAPI ni Postman collection</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features présentes -->
+  <div class="section">
+    <div class="section-title">Fonctionnalités implémentées</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Backend</div><span class="badge badge-ok">80%</span></div>
+        <div class="tag-list">
+          <span class="tag">Auth (register/login/logout/me)</span>
+          <span class="tag">CRUD Questions/Feed</span>
+          <span class="tag">CRUD Events</span>
+          <span class="tag">CRUD Spots + nearby</span>
+          <span class="tag">Conversations & messages</span>
+          <span class="tag">Réactions & commentaires</span>
+          <span class="tag">Système d'amis</span>
+          <span class="tag">Validation FormRequest</span>
+          <span class="tag">Politiques d'autorisation</span>
+          <span class="tag">MapService (géospatial)</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Frontend</div><span class="badge badge-warn">76%</span></div>
+        <div class="tag-list">
+          <span class="tag">Page Landing</span>
+          <span class="tag">Login / Register</span>
+          <span class="tag">Feed avec création de posts</span>
+          <span class="tag">Grille d'événements</span>
+          <span class="tag">Carte Leaflet interactive</span>
+          <span class="tag">Messagerie (UI)</span>
+          <span class="tag">Profil athlète</span>
+          <span class="tag">Navbar responsive</span>
+          <span class="tag">Sidebar de navigation</span>
+          <span class="tag">PostCard + EventCard</span>
+          <span class="tag">TrendingWidget</span>
+          <span class="tag">BaseModal réutilisable</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap -->
+  <div class="section">
+    <div class="section-title">Roadmap recommandée</div>
+    <div class="card">
+      <div class="road-item">
+        <span class="road-phase badge badge-err">Phase 1</span>
+        <div><div class="road-text">Tests & Upload de fichiers</div><div class="road-sub">Feature tests PHPUnit · upload images S3/local · modals upload · 3–10h</div></div>
+      </div>
+      <div class="road-item">
+        <span class="road-phase badge badge-err">Phase 1</span>
+        <div><div class="road-text">Données de seed réalistes</div><div class="road-sub">50+ users · 20+ events · 30+ posts · données géographiques · 2–3h</div></div>
+      </div>
+      <div class="road-item">
+        <span class="road-phase badge badge-warn">Phase 2</span>
+        <div><div class="road-text">Real-time messaging complet</div><div class="road-sub">WebSockets testés · typing indicators · statuts de lecture</div></div>
+      </div>
+      <div class="road-item">
+        <span class="road-phase badge badge-warn">Phase 2</span>
+        <div><div class="road-text">Responsive mobile</div><div class="road-sub">MapPage stack vertical · ProfilePage grid responsive · modals padding</div></div>
+      </div>
+      <div class="road-item">
+        <span class="road-phase badge badge-warn">Phase 2</span>
+        <div><div class="road-text">Gestion profil & avatar</div><div class="road-sub">Modal édition profil · upload avatar · page paramètres</div></div>
+      </div>
+      <div class="road-item">
+        <span class="road-phase badge badge-neu">Phase 3</span>
+        <div><div class="road-text">Accessibilité & polish UI</div><div class="road-sub">Focus states · ARIA labels · badge colors · dark mode</div></div>
+      </div>
+      <div class="road-item" style="border-bottom:none;">
+        <span class="road-phase badge badge-neu">Phase 3</span>
+        <div><div class="road-text">Admin panel & notifications</div><div class="road-sub">Interface admin basique · système de notifications · recherche</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Score final -->
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);">Verdict global</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px;line-height:1.55;">
+        Architecture solide, patterns corrects, fondations prêtes à scaler.<br>
+        Priorités immédiates : tests, upload fichiers, real-time.
+      </div>
+    </div>
+    <div style="text-align:center;flex-shrink:0;">
+      <div style="font-size:36px;font-weight:500;color:var(--color-text-primary);">72%</div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);">complété</div>
+    </div>
+  </div>
+
+</div>

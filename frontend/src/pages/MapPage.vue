@@ -10,21 +10,21 @@
           <h1 class="text-lg font-bold">Sport Spots & Active Games</h1>
           <div class="flex-1" />
           <div class="flex items-center gap-2">
-            <button @click="showSuggest = true" class="btn-secondary !py-1.5 !px-4 !text-sm flex items-center gap-1.5 border-orange-200 text-orange-600">
+            <button @click="showSuggest = true" aria-label="Suggest a new sports spot" class="btn-secondary !py-1.5 !px-4 !text-sm flex items-center gap-1.5 border-orange-200 text-orange-600">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Suggest Spot
+              <span class="hidden sm:inline">Suggest Spot</span>
             </button>
-            <button @click="locateMe" class="btn-secondary !py-1.5 !px-4 !text-sm flex items-center gap-1.5">
+            <button @click="locateMe" aria-label="Show spots near my location" class="btn-secondary !py-1.5 !px-4 !text-sm flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              Near Me
+              <span class="hidden sm:inline">Near Me</span>
             </button>
           </div>
         </div>
 
         <div class="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
           <!-- Map container with dashboard frame -->
-          <div class="relative flex-1 p-4 md:p-6 bg-gray-50/50 flex flex-col min-h-[450px] lg:min-h-0">
-            <div class="flex-1 relative rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white ring-1 ring-black/5 z-0 bg-white">
+          <div class="relative flex-1 p-2 md:p-6 bg-gray-50/50 flex flex-col min-h-[40vh] lg:min-h-0">
+            <div class="flex-1 relative rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 md:border-8 border-white ring-1 ring-black/5 z-0 bg-white">
               <div ref="mapEl" class="absolute inset-0" />
               
               <!-- Mobile Toggle List Button (Inside Frame) -->

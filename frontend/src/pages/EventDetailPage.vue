@@ -84,7 +84,18 @@
                     </div>
                     <div>
                       <p class="text-xs text-gray-400 font-bold uppercase tracking-tighter">Location</p>
-                      <p class="font-bold text-gray-700">{{ event.location }}</p>
+                      <!-- Has coordinates → link to internal map -->
+                      <router-link
+                        v-if="event.latitude && event.longitude"
+                        :to="{ name: 'map', query: { lat: event.latitude, lng: event.longitude, label: event.location } }"
+                        class="font-bold text-gray-700 hover:text-orange-500 transition-colors inline-flex items-center gap-1.5 group/loc"
+                        title="View on Map"
+                      >
+                        {{ event.location }}
+                        <svg class="w-3.5 h-3.5 opacity-0 group-hover/loc:opacity-100 transition-opacity text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                      </router-link>
+                      <!-- No coordinates → plain text -->
+                      <p v-else class="font-bold text-gray-700">{{ event.location || '—' }}</p>
                     </div>
                   </div>
 

@@ -108,6 +108,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import SuggestSpotModal from '@/modals/SuggestSpotModal.vue'
@@ -115,6 +116,7 @@ import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { useAppStore } from '@/stores/app'
 
 const appStore = useAppStore()
+const route    = useRoute()
 const mapEl    = ref(null)
 const showSuggest = ref(false)
 const showMobileList = ref(false)
@@ -174,6 +176,31 @@ onMounted(async () => {
   setTimeout(() => {
     leafletMap?.invalidateSize()
   }, 250)
+
+  // ── Fly to event location if navigated from an event ──────────────
+  const qLat   = parseFloat(route.query.lat)
+  const qLng   = parseFloat(route.query.lng)
+  const qLabel = route.query.label || 'Event Location'
+
+  if (!isNaN(qLat) && !isNaN(qLng)) {
+    // Wait a tick so the map tiles settle before flying
+    setTimeout(() => {
+      const pinIcon = L.divIcon({
+        html: `<div style="width:36px;height:36px;background:#f97316;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(249,115,22,.6);"></div>`,
+        className: 'event-pin-icon',
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -38],
+      })
+
+      leafletMap.flyTo([qLat, qLng], 16, { animate: true, duration: 1.2 })
+
+      L.marker([qLat, qLng], { icon: pinIcon })
+        .addTo(leafletMap)
+        .bindPopup(`<div style="padding:4px 2px"><strong style="font-size:13px">${qLabel}</strong><br><span style="font-size:11px;color:#6b7280">Event Location</span></div>`)
+        .openPopup()
+    }, 400)
+  }
 
   // Markers layer group
   const markersLayer = L.layerGroup().addTo(leafletMap)

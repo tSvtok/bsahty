@@ -20,33 +20,6 @@
       />
       <p v-if="errors.body" class="text-red-500 text-xs -mt-2">{{ errors.body }}</p>
 
-      <!-- Image Upload -->
-      <div>
-        <label class="label">Add an Image <span class="text-gray-400 font-normal">(optional)</span></label>
-        <div 
-          v-if="!form.image_url"
-          class="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-orange-300 hover:bg-orange-50/50 transition-all cursor-pointer group"
-          @click="$refs.fileInput.click()"
-        >
-          <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-orange-100 group-hover:text-orange-500 transition-colors">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          </div>
-          <p class="text-sm text-gray-500 font-medium">Click to upload photo</p>
-          <p class="text-xs text-gray-400">PNG, JPG up to 5MB</p>
-          <input ref="fileInput" type="file" class="hidden" accept="image/*" @change="handleFileUpload" />
-        </div>
-
-        <!-- Preview -->
-        <div v-else class="relative group rounded-2xl overflow-hidden border border-gray-100">
-          <img :src="form.image_url" class="w-full max-h-64 object-cover" />
-          <button 
-            @click="form.image_url = ''"
-            class="absolute top-2 right-2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-      </div>
 
       <!-- Sport tag -->
       <div>
@@ -88,7 +61,7 @@ const auth    = useAuthStore()
 const appStore = useAppStore()
 
 const loading = ref(false)
-const form    = ref({ body: '', image_url: '', image_path: '', sport: '' })
+const form    = ref({ body: '', sport: '' })
 const errors  = ref({})
 
 const myAvatar = computed(() =>
@@ -104,27 +77,6 @@ function validate() {
   return !Object.keys(errors.value).length
 }
 
-async function handleFileUpload(e) {
-  const file = e.target.files[0]
-  if (!file) return
-
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('type', 'post')
-
-  loading.value = true
-  try {
-    const res = await api.post('/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    form.value.image_url = res.data.url
-    form.value.image_path = res.data.path
-  } catch (err) {
-    errors.value.body = 'Failed to upload image.'
-  } finally {
-    loading.value = false
-  }
-}
 
 async function submit() {
   if (!validate()) return
@@ -132,11 +84,10 @@ async function submit() {
   try {
     const payload = {
       content: form.value.body,
-      sport_category: form.value.sport ? form.value.sport.toUpperCase() : 'OTHER',
-      image: form.value.image_path
+      sport_category: form.value.sport ? form.value.sport.toUpperCase() : 'OTHER'
     }
     await appStore.createPost(payload)
-    form.value = { body: '', image_url: '', image_path: '', sport: '' }
+    form.value = { body: '', sport: '' }
     emit('update:modelValue', false)
   } catch (e) {
     errors.value.body = e?.response?.data?.message || 'Failed to post.'

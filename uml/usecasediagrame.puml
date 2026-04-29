@@ -13,14 +13,23 @@ rectangle "B-SSAHTY Platform" {
 
   (Register)
   (Login)
+  (Authenticate)
 
   (Edit Profile)
+  (Change Name)
+  (Change Image)
+  (Change Bio)
+  (Change City)
+  (Update Favorite Sports)
+
   (View Feed)
+  (Create Feed)
+
   (Post)
   (Comment)
   (Like)
 
-  (add Friends)
+  (Add Friends)
   (Chat)
 
   (Map & Spots)
@@ -34,32 +43,52 @@ rectangle "B-SSAHTY Platform" {
   (Ban Users)
 }
 
-' --- Guest ---
-Guest --> (Register)
-Guest --> (Login)
+' ========================
+' Actors
+' ========================
+Guest -- (Register)
+Guest -- (Login)
 
-' --- User ---
-User --> (Edit Profile)
-User --> (View Feed)
-User --> (Post)
-User --> (Comment)
-User --> (Like)
-User --> (add Friends)
-User --> (Chat)
-User --> (Map & Spots)
-User --> (Create Spot)
-User --> (Create Event)
-User --> (Join Event)
+User -- (Edit Profile)
+User -- (View Feed)
+User -- (Create Feed)
+User -- (Post)
+User -- (Comment)
+User -- (Like)
+User -- (Add Friends)
+User -- (Chat)
+User -- (Map & Spots)
+User -- (Create Spot)
+User -- (Create Event)
+User -- (Join Event)
 
-' --- Admin ---
-Admin --> (Admin Panel)
-Admin --> (Approve Spots)
-Admin --> (Ban Users)
+Admin -- (Admin Panel)
+Admin -- (Approve Spots)
+Admin -- (Ban Users)
 
-' --- simple rule note ---
-note right of (add Friends)
-  A user can't add
-  the same friend twice
-end note
+(View Feed) ..> (Authenticate)
+(Create Feed) ..> (Authenticate)
+(Post) ..> (Authenticate)
+(Comment) ..> (Authenticate)
+(Like) ..> (Authenticate)
+(Add Friends) ..> (Authenticate)
+(Chat) ..> (Authenticate)
+(Map & Spots) ..> (Authenticate)
+(Create Spot) ..> (Authenticate)
+(Create Event) ..> (Authenticate)
+(Join Event) ..> (Authenticate)
+(Admin Panel) ..> (Authenticate)
+(Approve Spots) ..> (Authenticate)
+(Ban Users) ..> (Authenticate)
+(Edit Profile) ..> (Authenticate)
+
+' ========================
+' EDIT PROFILE DECOMPOSITION (NO INCLUDE)
+' ========================
+(Edit Profile) <-- (Change Name)
+(Edit Profile) <-- (Change Image)
+(Edit Profile) <-- (Change Bio)
+(Edit Profile) <-- (Change City)
+(Edit Profile) <-- (Update Favorite Sports)
 
 @enduml

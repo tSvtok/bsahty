@@ -1,15 +1,11 @@
 @startuml
 
 skinparam classAttributeIconSize 0
-skinparam roundcorner 10
+skinparam roundcorner 12
 skinparam class {
     BackgroundColor White
-    BorderColor Orange
+    BorderColor black
 }
-
-' ========================
-' ENUMS (kept simple)
-' ========================
 
 enum Role {
   USER
@@ -56,126 +52,123 @@ enum Sport {
   OTHER
 }
 
-' ========================
-' MAIN ENTITIES
-' ========================
-
 class User {
-  id
-  name
-  email
-  bio
-  location
-  avatar
-  city
-  sports
-  is_banned
-  role
-  level
+  +id: int
+  +name: string
+  +email: string
+  +bio: text
+  +location: string
+  +city: string
+  +avatar: string
+  +sports: Sport[]
+  +is_banned: boolean
+  +role: Role
+  +level: Level
+  +created_at: datetime
 }
 
 class Spot {
-  id
-  name
-  type
-  address
-  city
-  status
-  image
+  +id: int
+  +name: string
+  +type: string
+  +address: string
+  +city: string
+  +status: Status
+  +image: string
+  +created_at: datetime
 }
 
 class Event {
-  id
-  title
-  sport
-  date
-  location
-  max_participants
-  status
-  organizer_id
-  spot_id
+  +id: int
+  +title: string
+  +sport: Sport
+  +date: datetime
+  +location: string
+  +max_participants: int
+  +status: EventStatus
+  +organizer_id: int
+  +spot_id: int
+  +created_at: datetime
 }
 
 class Question {
-  id
-  title
-  content
-  image
-  sport
-  user_id
-  spot_id
-  event_id
+  +id: int
+  +title: string
+  +content: text
+  +image: string
+  +sport: Sport
+  +user_id: int
+  +spot_id: int
+  +event_id: int
+  +created_at: datetime
 }
 
 class Comment {
-  id
-  content
-  user_id
-  question_id
+  +id: int
+  +content: text
+  +user_id: int
+  +question_id: int
+  +created_at: datetime
 }
 
 class Reaction {
-  id
-  type
-  user_id
-  target_id
-  target_type
+  +id: int
+  +type: ReactionType
+  +user_id: int
+  +target_id: int
+  +target_type: string
+  +created_at: datetime
 }
 
 class Friendship {
-  id
-  user_id
-  friend_id
-  status
+  +id: int
+  +user_id: int (requester)
+  +friend_id: int (receiver)
+  +status: FriendshipStatus
+  +created_at: datetime
 }
 
 class Conversation {
-  id
+  +id: int
+  +created_at: datetime
 }
 
 class Message {
-  id
-  content
-  is_read
-  user_id
-  conversation_id
+  +id: int
+  +content: text
+  +is_read: boolean
+  +user_id: int
+  +conversation_id: int
+  +created_at: datetime
 }
 
 class Notification {
-  id
-  type
-  data
-  read_at
-  user_id
+  +id: int
+  +type: string
+  +data: json
+  +read_at: datetime
+  +user_id: int
 }
 
-' ========================
-' RELATIONSHIPS (human style)
-' ========================
+User "1" -- "0..*" Question : writes
+User "1" -- "0..*" Comment : comments
+User "1" -- "0..*" Message : sends
+User "1" -- "0..*" Friendship : requester -> receiver
+User "1" -- "0..*" Event : organizes
+User "1" -- "0..*" Spot : creates
 
-User "1" -- "*" Question : posts
-User "1" -- "*" Comment : writes
-User "1" -- "*" Reaction : reacts
-User "1" -- "*" Message : sends
-User "1" -- "*" Friendship : connects
-User "1" -- "*" Event : organizes
-User "1" -- "*" Spot : creates
+Event "0..*" -- "0..1" Spot : hosted_at
+Event "*" -- "*" User : participates
 
-Event "*" -- "1" Spot : happens at
-Event "*" -- "1" User : organizer
+Question "1" -- "0..*" Comment : has
+Comment "1" -- "0..*" Reaction : receives
 
-Question "1" -- "*" Comment
-Question "1" -- "*" Reaction
-Comment "1" -- "*" Reaction
+Conversation "1" -- "0..*" Message : contains
 
-Conversation "1" -- "*" Message
+User "*" -- "0..*" Conversation : participates
 
-User "2" -- "*" Conversation : chats
-User "*" -- "*" Event : joins
 
-' simple polymorphic idea
-Reaction "*" -- "*" Question
-Reaction "*" -- "*" Comment
-Reaction "*" -- "*" Event
+Reaction "*" -- "1" Question : targets
+
 
 @enduml

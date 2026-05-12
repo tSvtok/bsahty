@@ -17,7 +17,7 @@ class QuestionController extends Controller
             $query->where('sport_category', $request->sport_category);
         }
 
-        // Paginate results (15 per page)
+        // Paginate results 
         return response()->json(['data' => $query->latest()->paginate(15)]);
     }
 

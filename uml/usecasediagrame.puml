@@ -43,9 +43,7 @@ rectangle "B-SSAHTY Platform" {
   (Ban Users)
 }
 
-' ========================
-' Actors
-' ========================
+
 Guest -- (Register)
 Guest -- (Login)
 
@@ -66,25 +64,23 @@ Admin -- (Admin Panel)
 Admin -- (Approve Spots)
 Admin -- (Ban Users)
 
-(View Feed) ..> (Authenticate)
-(Create Feed) ..> (Authenticate)
-(Post) ..> (Authenticate)
-(Comment) ..> (Authenticate)
-(Like) ..> (Authenticate)
-(Add Friends) ..> (Authenticate)
-(Chat) ..> (Authenticate)
-(Map & Spots) ..> (Authenticate)
-(Create Spot) ..> (Authenticate)
-(Create Event) ..> (Authenticate)
-(Join Event) ..> (Authenticate)
-(Admin Panel) ..> (Authenticate)
-(Approve Spots) ..> (Authenticate)
-(Ban Users) ..> (Authenticate)
-(Edit Profile) ..> (Authenticate)
 
-' ========================
-' EDIT PROFILE DECOMPOSITION (NO INCLUDE)
-' ========================
+(View Feed) ..> (Authenticate) : <<include>>
+(Create Feed) ..> (Authenticate) : <<include>>
+(Post) ..> (Authenticate) : <<include>>
+(Comment) ..> (Authenticate) : <<include>>
+(Like) ..> (Authenticate) : <<include>>
+(Add Friends) ..> (Authenticate) : <<include>>
+(Chat) ..> (Authenticate) : <<include>>
+(Map & Spots) ..> (Authenticate) : <<include>>
+(Create Spot) ..> (Authenticate) : <<include>>
+(Create Event) ..> (Authenticate) : <<include>>
+(Join Event) ..> (Authenticate) : <<include>>
+(Admin Panel) ..> (Authenticate) : <<include>>
+(Approve Spots) ..> (Authenticate) : <<include>>
+(Ban Users) ..> (Authenticate) : <<include>>
+(Edit Profile) ..> (Authenticate) : <<include>>
+
 (Edit Profile) <-- (Change Name)
 (Edit Profile) <-- (Change Image)
 (Edit Profile) <-- (Change Bio)

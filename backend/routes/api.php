@@ -14,12 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-*/
+
 
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -61,7 +56,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
     Route::post('/messages', [MessageController::class, 'store']);
     Route::patch('/messages/{message}/read', [MessageController::class, 'markAsRead']);
-
+    
+    // Admin 
     Route::middleware([\App\Http\Middleware\EnsureUserIsAdmin::class])->prefix('admin')->group(function () {
         Route::get('/stats', [AdminController::class, 'getStats']);
         Route::get('/spots/pending', [AdminController::class, 'getPendingSpots']);
